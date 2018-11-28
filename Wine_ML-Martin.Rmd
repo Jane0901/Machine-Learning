@@ -1,0 +1,131 @@
+---
+title: "Wine_ML"
+author: "Vvsy"
+date: "11/20/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+wine <- read.csv("~/Dropbox/M-Team/ML/wine.csv")
+str(wine)
+```
+
+```{r}
+library(caret)
+library(tidyverse)
+
+library(glmnet)
+library(class)
+library(randomForest)
+library(e1071)
+
+library(ggplot2)
+
+```
+
+# Regularized Regression
+```{r}
+set.seed(1234) # so that the indices will be the same when re-run
+# 抽出80%樣本來train, output format is matrix
+trainIndices = createDataPartition(wine$quality, p=.8, list=F) 
+
+# delete highly correlated free.sulfur and density
+wine_train = wine %>% 
+  select(-free.sulfur.dioxide, -density, -color, -white) %>% 
+  slice(trainIndices)
+
+wine_test = wine %>% 
+  select(-free.sulfur.dioxide, -density, -color, -white) %>% 
+  slice(-trainIndices)
+```
+
+# check distribution after normalization
+```{r}
+wine_trainplot = select(wine_train, -quality) %>% 
+  preProcess(method='range') %>% #標準化處理range =>  (x-min)/(max-min)
+  predict(newdata= select(wine_train, -quality)) #利用predict函數顯示出處理好的矩陣
+
+featurePlot(wine_trainplot, wine_train$quality, 'box')
+```
+
+
+```{r}
+# cross validation 10
+cv_opts = trainControl(method='cv', number=10) #定義模型訓練參數，劃分十組交叉驗證（使用repeatedcv可重複劃分）
+
+regreg_opts = expand.grid(.alpha = seq(.1, 1, length = 5),
+                          .lambda = seq(.1, .5, length = 5)) #25種組合(決定lamda重要度？)
+
+
+results_regreg = train(quality~., 
+                        data=wine_train,
+                        method = "glmnet", 
+                        trControl = cv_opts, 
+                        preProcess = c("center", "scale"), #指定數據標準化，"center"和"scale"。其中center表示預測變量減去均值
+                        tuneGrid = regreg_opts)
+
+results_regreg #kappa是一統計量指標衡量預測值與實質的差距
+ggplot(results_regreg)
+```
+alpha=mixing percentage
+lambda=regularization parameter
+
+```{r}
+preds_regreg = predict(results_regreg, wine_test)
+good_observed = wine_test$quality
+confusionMatrix(preds_regreg, good_observed, positive='good') 
+```
+
+The lower bound (and p-value) suggests we are statistically predicting better than the No Information Rate (i.e., just guessing the more prevalent ‘Bad’ category) -> 猜好的比猜壞的還強
+
+```{r}
+confusionMatrix(preds_regreg, good_observed, positive='good', mode='prec_recall')
+```
+
+# k-nearest Neighbors
+
+```{r}
+knn_opts = data.frame(k=c(seq(3, 11, 2), 25, 51, 101))
+knn_opts
+
+results_knn = train(quality~., 
+                    data=wine_train, 
+                    method='knn',
+                    preProcess=c('center', 'scale'), 
+                    trControl=cv_opts,
+                    tuneGrid = knn_opts)
+
+results_knn
+```
+
+```{r}
+preds_knn = predict(results_knn, wine_test)
+confusionMatrix(preds_knn, good_observed, positive='good')
+```
+
+# Neural networks
+
+```{r}
+results_nnet = train(quality~., 
+                     data=wine_train, 
+                     method='avNNet',
+                     trControl=cv_opts, 
+                     preProcess=c('center', 'scale'),
+                     tuneLength=3, 
+                     trace=F, 
+                     maxit=3)
+results_nnet
+```
+```{r}
+ggplot(results_nnet)
+```
+
+```{r}
+preds_nnet = predict(results_nnet, wine_test)
+confusionMatrix(preds_nnet, good_observed, positive='good')
+```
+
