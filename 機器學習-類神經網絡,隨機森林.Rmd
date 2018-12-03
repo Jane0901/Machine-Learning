@@ -2,7 +2,7 @@
 library(gplots)
 library(caret)
 library(tidyverse)
-wine <- read.csv('/Users/liguanzhi/Dropbox/wine.csv')
+wine <- read.csv('~/Dropbox/M-team/ML/wine.csv')
 set.seed(1234) # so that the indices will be the same when re-run
 trainIndices = createDataPartition(wine$quality, p=.8, list=F)
 
