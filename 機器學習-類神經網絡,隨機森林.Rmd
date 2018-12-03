@@ -26,6 +26,7 @@ good_observed = wine_test$quality
 類神經網絡：
 
 ```{r}
+cv_opts = trainControl(method='cv', number=10)
 results_nnet = train(quality~., 
                      data=wine_train, 
                      method='avNNet',
