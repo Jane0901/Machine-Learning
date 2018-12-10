@@ -41,7 +41,7 @@ ggplot(results_nnet) +
   labs(x='Number of Hidden Units') +
   scale_x_continuous(breaks = c(1,3,5,7,9))
 preds_nnet = predict(results_nnet, wine_test)
-confusionMatrix(preds_nnet, good_observed, positive='Good')
+confusionMatrix(preds_nnet, good_observed, positive='good')
 
 
 #results_nnet1 = train(quality~., 
