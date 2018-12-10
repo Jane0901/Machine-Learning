@@ -47,7 +47,7 @@ good_observed = wine_test$quality
 
 參考資料：
 
-  - <https://topepo.github.io/caret/model-training-and-tuning.html>
+  - <https://topepo.github.io/caret/train-models-by-tag.html#Neural_Network>
 
 ### 1. How the model is evaluated
 Here we choose: **k-fold Cross-validation**
@@ -120,7 +120,23 @@ results_regreg = train( ...
 ```
 </div>
 
-隨機森林：
+## 隨機森林
+
+參考資料：<https://topepo.github.io/caret/train-models-by-tag.html#Random_Forest>
+
+### 1. 概念
+
+給定一組training data，演算法會決定那一棵樹最適合它(?)。Random forest透過Boostrapping產生如1000個training data，每個用來找一棵最適合它的樹，最後以這1000顆樹來衡量它對真正test data的預測（採多數決）。
+
+### 2. Cross-Validation & Pre processing
+
+同前
+
+### 3. Tuning parameters
+
+mtry: 隨機選出來架構樹的節點之特徵變數
+
+ntree: 透過Boostrapping來產生「找樹用的」training data(一組樣本找一顆)。
 
 ```{r}
 
@@ -132,7 +148,7 @@ results_rf = train(quality~.,
                    trControl = cv_opts,
                    tuneGrid = rf_opts,
                    localImp = T,
-                   ntree=1000)
+                   ntree=100)
 results_rf
 preds_rf = predict(results_rf, wine_test)
 preds_rf
