@@ -47,7 +47,9 @@ good_observed = wine_test$quality
 
 參考資料：
 
-  - <https://topepo.github.io/caret/model-training-and-tuning.html>
+  - <https://topepo.github.io/caret/train-models-by-tag.html>
+  
+  - 所以的模型都先看一下train-model bt tag，來看一下基本設定，以及模型特有的東西。
 
 ### 1. How the model is evaluated
 Here we choose: **k-fold Cross-validation**
