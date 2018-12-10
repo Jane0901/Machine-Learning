@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1543804452231.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "DF20B6FA",
+    "lastKnownWriteTime" : 1544428067,
+    "last_content_update" : 1544428067,
+    "path" : "~/Documents/GitHub/Machine-Learning/機器學習-類神經網絡,隨機森林.Rmd",
+    "project_path" : "機器學習-類神經網絡,隨機森林.Rmd",
+    "properties" : {
+        "cursorPosition" : "42,3",
+        "docOutlineVisible" : "0",
+        "scrollLine" : "68"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
