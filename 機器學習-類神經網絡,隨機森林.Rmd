@@ -75,7 +75,15 @@ confusionMatrix(preds_rf, good_observed, positive='good')
 varImp(results_rf)
 ```
 
+```{r}
+library(randomForestExplainer)
+plot_min_depth_distribution(results_rf$finalModel)
+plot_min_depth_interactions(results_rf$finalModel, k=7)
 
+multi_imps = measure_importance(results_rf$finalModel)
+plot_importance_ggpairs(multi_imps)
+
+```
 
 
 
