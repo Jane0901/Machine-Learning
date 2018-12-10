@@ -1,4 +1,7 @@
 ```{r}
+library(doParallel)
+cl = makeCluster(2)
+registerDoParallel(cl)
 library(gplots)
 library(caret)
 library(tidyverse)
@@ -85,6 +88,19 @@ plot_importance_ggpairs(multi_imps)
 
 ```
 
+```{r}
+# https://arxiv.org/pdf/1501.07196
+# tibble causes problem so convert wine_train to standard df.
+library(ggRandomForests)
+rf2 = rfsrc(formula = quality ~., 
+            data = data.frame(wine_train),
+            mtry = results_rf$finalModel$mtry)
+gg_v = gg_variable(rf2)
+gg_md = gg_minimal_depth(rf2)
 
+# We want the top two ranked minimal depth variables only
+xvar = gg_md$topvars[1:2]
+plot(gg_v, xvar=xvar, panel=TRUE, partial=TRUE, alpha=.1)
+```
 
 
