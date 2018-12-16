@@ -15,14 +15,24 @@ knitr::opts_chunk$set(echo = TRUE,eval=FALSE)
 
 <img src="http://topepo.github.io/caret/premade/TrainAlgo.png">
 
+### 1.啟用r平行運算
+
 ```{r}
 library(doParallel)
 cl = makeCluster(2)
 registerDoParallel(cl)
+```
+
+### 2.資料處理
+
+造出train/test data
+
+```{r}
 library(gplots)
 library(caret)
 library(tidyverse)
 wine <- read.csv('~/Dropbox/M-team/ML/wine.csv')
+wine$quality=factor(wine$quality)
 set.seed(1234) # so that the indices will be the same when re-run
 trainIndices = createDataPartition(wine$quality, p=.8, list=F)
 
@@ -39,7 +49,6 @@ wine_trainplot = select(wine_train, -quality) %>%
   predict(newdata= select(wine_train, -quality))
 
 good_observed = wine_test$quality
-
 ```
 
 
@@ -153,24 +162,48 @@ results_rf = train(quality~.,
                    localImp = T,
                    ntree=100)
 results_rf
+```
+
+### 4. make confusionm matrix
+
+參考資料：<https://hyp.is/f2kmRgEUEemKAFeGta_7RA/m-clark.github.io/introduction-to-machine-learning/opening-the-black-box.html>
+
+```{r}
 preds_rf = predict(results_rf, wine_test)
 preds_rf
 confusionMatrix(preds_rf, good_observed, positive='good')
+```
+
+### 5. 變數重要性衡量
+
+#### 1. VIMP
+
+```{r}
 varImp(results_rf)
 ```
+
+#### 2. Minimal depth
 
 ```{r}
 library(randomForestExplainer)
 plot_min_depth_distribution(results_rf$finalModel)
 plot_min_depth_interactions(results_rf$finalModel, k=7)
-
-multi_imps = measure_importance(results_rf$finalModel)
-plot_importance_ggpairs(multi_imps)
-
 ```
 
+#### 3. Other Measures
+
+參考資料：<https://cran.r-project.org/web/packages/randomForestExplainer/vignettes/randomForestExplainer.html>
+
 ```{r}
-# https://arxiv.org/pdf/1501.07196
+multi_imps = measure_importance(results_rf$finalModel)
+plot_importance_ggpairs(multi_imps)
+```
+
+### 6. 觀察兩兩變數之關係
+
+參考資料：ggRandomForests <https://arxiv.org/pdf/1501.07196>
+
+```{r}
 # tibble causes problem so convert wine_train to standard df.
 library(ggRandomForests)
 rf2 = rfsrc(formula = quality ~., 
@@ -178,10 +211,34 @@ rf2 = rfsrc(formula = quality ~.,
             mtry = results_rf$finalModel$mtry)
 gg_v = gg_variable(rf2)
 gg_md = gg_minimal_depth(rf2)
-
 # We want the top two ranked minimal depth variables only
 xvar = gg_md$topvars[1:2]
 plot(gg_v, xvar=xvar, panel=TRUE, partial=TRUE, alpha=.1)
+plot_explanations(rf_explain)
 ```
+
+### 7. LIME
+
+參考資料： <https://hyp.is/Y71xhgEtEemBKXsjotd-uw/m-clark.github.io/introduction-to-machine-learning/opening-the-black-box.html>
+
+```{r}
+set.seed(1234)
+sample_index = sample(1:nrow(wine_test), 5)
+sample_test = wine_test %>% 
+  slice(sample_index) %>% 
+  select(-quality)
+library(lime)
+rf_lime = lime(wine_train, results_rf)
+rf_explain = explain(sample_test, 
+                     rf_lime, 
+                     n_features = 3,
+                     feature_select = 'highest_weights',
+                     labels = 'Good')#error:y is constant; gaussian glmnet fails at standardization step
+plot_features(rf_explain)
+```
+
+
+
+
 
 
