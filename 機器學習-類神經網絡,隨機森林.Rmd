@@ -167,7 +167,6 @@ mtry: 隨機選出來用來架構樹之節點的特徵變數個數
 ntree: 透過Boostrapping來產生「找樹用的」training data(一組樣本找一顆)。
 
 ```{r}
-
 rf_opts = data.frame(mtry=c(2:6))
 results_rf = train(quality~., 
                    data = wine_train,
@@ -210,3 +209,7 @@ plot(gg_v, xvar=xvar, panel=TRUE, partial=TRUE, alpha=.1)
 ```
 
 
+兩個問題：
+
+1. minimum depth 出現兩次，要怎麼算是他是第1/2/1.5次數
+2. interaction裡面unconditional term是什麼意思?
