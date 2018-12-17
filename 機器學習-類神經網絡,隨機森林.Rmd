@@ -13,12 +13,27 @@ knitr::opts_chunk$set(echo = TRUE,eval=FALSE)
 
 ## 機器學習步驟
 
+### 流程圖
+
 <img src="http://topepo.github.io/caret/premade/TrainAlgo.png">
 
+### CPU平行運算
+
+開始
 ```{r}
 library(doParallel)
 cl = makeCluster(2)
 registerDoParallel(cl)
+```
+
+結束
+```{r, eval=F}
+stopCluster(cl)
+```
+
+### 切割資料
+
+```{r}
 library(gplots)
 library(caret)
 library(tidyverse)
@@ -129,6 +144,14 @@ results_regreg = train( ...
 
 ### 1. 概念
 
+#### 1.1 Decision tree classifier
+
+[Basic concept](https://medium.com/machine-learning-101/chapter-3-decision-trees-theory-e7398adac567): 非常清楚的說明
+
+[scikit code documentation](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier)
+
+#### 1.2 Random forest classifier
+
 給定一組training data，演算法會決定那一棵樹最適合它(?)。Random forest透過Boostrapping產生如1000個training data，每個用來找一棵最適合它的樹，最後以這1000顆樹來衡量它對真正test data的預測（採多數決）。
 
 ### 2. Cross-Validation & Pre processing
@@ -137,7 +160,9 @@ results_regreg = train( ...
 
 ### 3. Tuning parameters
 
-mtry: 隨機選出來架構樹的節點之特徵變數
+mtry: 隨機選出來用來架構樹之節點的特徵變數個數
+
+> In addition, when splitting a node during the construction of the tree, the split that is chosen (即用什麼特徵變數來進一步分類) is no longer the best split among all features. Instead, the split that is picked is the best split among a random subset of the features. ...[scikit code documentation](https://scikit-learn.org/stable/modules/ensemble.html#forest)
 
 ntree: 透過Boostrapping來產生「找樹用的」training data(一組樣本找一顆)。
 
