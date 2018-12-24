@@ -188,15 +188,41 @@ preds_rf
 confusionMatrix(preds_rf, good_observed, positive='good')
 ```
 
+利用confusionMatrix觀察模型衡量指標（準確率、召回率．．．）並依照研究問題判斷模型適不適合。
+
 ### 5. 變數重要性衡量
 
+**參考資料**: <https://cran.rstudio.com/web/packages/randomForestExplainer/vignettes/randomForestExplainer.html>
+
 #### 5.1 VIMP
+
+概念：利用特徵經過置換前與置換後的誤差影響，來衡量該特徵的重要性。
+
+步驟：
+
+1. 利用每棵樹的分類模型來預測自己的OOB樣本，並計算錯誤率。
+
+  * OOB：在建構每棵樹的時候，我們對訓練集使用了不同的bootstrap sample。所以對於每棵樹而言，大约有1/3的資料點是沒有參與該棵樹的生成，他們就是該棵樹的OOB样本。
+
+2. 對想了解該特徵重要性的特徵進行隨機打亂，例如：把各資料點的「酒精濃度」進行隨機打亂。
+
+3. 利用原隨機森林模型進行預測得到新的outcome。
+
+4. 計算每棵樹新的OOB樣本錯誤率。
+
+5. 對於每棵樹擾亂特徵前後所得到的錯誤率相減並平均。
+
+6. 得出因該特徵擾亂後而導致的平均誤差上升多少，越高代表該變數越重要。
 
 ```{r}
 varImp(results_rf)
 ```
 
 #### 5.2 Minimal depth
+
+概念：每棵樹在生成每個節點時都會有一個特徵，在樹越上層（越淺）的特徵重要程度會越大，利用此特點來計算特徵的平均最小深度觀察特徵的重要性。
+
+補充：假設森林有兩棵樹，A樹中特徵「酒精濃度」出現在第一層，B樹中「酒精濃度」出現在第二層與第四層，那麼平均最小深度為($\frac{7}{3}$)
 
 ```{r}
 library(randomForestExplainer)
@@ -217,10 +243,6 @@ plot_importance_ggpairs(multi_imps)
 
 參考資料：ggRandomForests <https://arxiv.org/pdf/1501.07196>
 
-xvar=gg_md$topvars[1:2]，表示取出前兩個最重要的變數。
-
-下圖中(10,0.75,紅)，表示有一瓶酒，他的酒精濃度為10，1000棵樹裡面有750棵說他是好的，但它實際上是壞的（紅色）。
-
 ```{r}
 # tibble causes problem so convert wine_train to standard df.
 library(ggRandomForests)
@@ -231,64 +253,78 @@ gg_v = gg_variable(rf2)
 gg_md = gg_minimal_depth(rf2)
 gg_v
 gg_md
-xvar = gg_md$topvars[1:2]
+xvar = gg_md$topvars[1:2]#表示取出前兩個最重要的變數。
 plot(gg_v, xvar=xvar, panel=TRUE, partial=TRUE, alpha=.1)
 ```
 
+圖中縱軸為模型判定為good的機率，每一個點代表一個資料點，顏色為該資料點的真實outcome，以點(10,0.75,紅)為例；表示有一瓶酒，其酒精濃度為10且1000棵樹裡面有750棵說他是good(0.75)，但它實際上是壞的（紅色）。
+
 ### 7. LIME
 
-LIME 想要解決的問題：能不能夠找到一個容易解釋的模型 g 解釋為什麼一個個體會被分類到f預測的類別。
-
-    概念：我們希望利用特徵去預測一個個體，可以得到一個複雜但預測準確的模型f，但是我們很難用一個簡單的模型且可解釋的模型逼近，因此我們需要利用「局部」；在個體的附近找出一個線性（簡單）的決策區域作為可解釋該個體的模型，這個決策模型在該個體附近的預測準確度與f相當，但在離該個體較遠的區域預測準確度就會大幅下降，這就是所謂的局部性。
+LIME 想要解決的問題：找到一個容易解釋的模型 g 解釋為什麼一個個體會被分類到f預測的類別；f是依據什麼特徵來分類近一步了解各特徵的重要性。
 
  參考資料： <https://medium.com/@kstseng/lime-local-interpretable-model-agnostic-explanation-%E6%8A%80%E8%A1%93%E4%BB%8B%E7%B4%B9-a67b6c34c3f8>
 
 步驟：
 
-- Loss function: L(f,g,$\pi_{{x}_i}$) + $\Omega(g)$
+每一瓶酒
 
-    f為複雜模型、g為可解釋模型（線性回歸），$\Omega(g)$為懲罰項希望g能簡單一點，越相似的個體，應該要給予可解釋模型與複雜模型間的誤差較重權重，因此會有一個計算「與${x}_i$相似與否」的核函數 $\pi_{{x}_i}$(kernel function)。
+1. Permute the data n times to create data with similar distributional properties to the original.
+  
+  * 創造相似的酒（特徵變化要符合原始資料特徴間的統計性質，如變異及相關程度）。
+  
+    擾動樣本：進行有意義的擾動（改變${x}_i$的幾個特徵值），產生新的輸入資料${z}_i$。
 
-- 擾動樣本：進行有意義的擾動（改變${x}_i$的幾個特徵值），產生新的輸入資料（${z}_i$這些新資料是局部性的）帶入你的模型來觀察輸出結果。
+2. Get similarity scores of the permuted observations to the observations you wish to explain.
 
--  min loss function : $\sum\pi_{{x}_i}(f(z)-g(z))^2+ \Omega(g)$
+  * 依相似度要計算與原本那瓶酒的 「相似度」；與原資料的距離越近者給予的係數 $\pi_{{x}_i}$ 越大，之後權重用。
 
-- 利用g去跑原始資料得出變數的係數觀察之間的重要程度
+3. Make predictions with the permuted data based on the ML model.
+
+
+  * 對新樣本(${z}_i$)做ML分類得到新樣本得預測結果g(z)。
+  
+4. Min loss function : $\sum\pi_{{x}_i}(f(z)-g(z))^2+ \Omega(g)$
+
+  * f(z)為真實outcome，$\Omega(g)$為懲罰項目的為希望g能簡單一點，$\pi_{{x}_i}$為「與${x}_i$相似與否」的核函數。極小化loss function 找出最適的g。
+
+4. Select m features (e.g. forward selection, lasso) best describing the complex model outcome from the permuted data.
+
+  * 選擇一組你想理解對ML結果影響重要的特徵。
+
+5. Fit a simple model, e.g. standard regression, predicting the predictions from the ML model with the m features, where observations are weighted by similarity to the to-be-explained observations.
+
+  * 對摸擬樣本${z}_i$與選好的幾個特徵進行加權迴歸(model g)，觀察各特徵係數值；係數值越大者越重要。
+
+因為LIME很吃電腦資源所以下例程式碼中只隨機挑選了5個case（5個資料點）進行LIME
 
 ```{r}
 set.seed(1234)
-sample_index = sample(1:nrow(wine_test), 5)
+sample_index = sample(1:nrow(wine_test), 5)#隨機選取幾個case
 sample_test = wine_test %>% 
   slice(sample_index) %>% 
-  select(-quality)
+  select(-quality) #分別拿掉5個case的outcome
 library(lime)
-rf_lime = lime(wine_train, results_rf)
+rf_lime = lime(wine_train, results_rf)#lime
 rf_explain = explain(sample_test, 
                      rf_lime, 
-                     n_features = 3,
+                     n_features = 3,#只看三種特徵的組合
                      feature_select = 'highest_weights',
-                     labels = 'good')#error:y is constant; gaussian glmnet fails at standardization step
+                     labels = 'good')
+rf_explain#各case跑完lime的係數狀況
 plot_features(rf_explain)
 plot_explanations(rf_explain)
 ```
 
-記得對圖作解釋
+以case 1 為例：
 
-
-
-
-兩個問題：
-
-1. minimum depth 出現兩次，要怎麼算是他是第1/2/1.5次數
-
-假設森林只有一棵樹，在同一棵主樹裡，某變數的minimum depth出現在第一層和第二層，minimal depth mean(5-2處)是1.5
-
-2. interaction裡面unconditional term是什麼意思?
-
-
-
-
-
+  * Probablity為預測good的機率 
+  * feature_weight為-0.15表示當「0.40 < volatile.acidity」時，每增加一單位酸度y便會造成減少0.16。
+  * \[y = \left\{\begin{array}{ll}
+                 bad, & \mbox{if $y<0$} \\  
+                 good, & \mbox{if $y>0$} \\  
+                \end{array} \right.\]
+  * Explanation為$R^2$
 
 
 
