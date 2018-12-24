@@ -261,7 +261,7 @@ plot(gg_v, xvar=xvar, panel=TRUE, partial=TRUE, alpha=.1)
 
 ### 7. LIME
 
-LIME 想要解決的問題：找到一個容易解釋的模型 g 解釋為什麼一個個體會被分類到f預測的類別；f是依據什麼特徵來分類近一步了解各特徵的重要性。
+LIME 想要解決的問題：找到一個容易解釋的模型 g 解釋為什麼一個個體會被分類到f預測的類別；f是依據什麼特徵來分類進一步了解各特徵的重要性。
 
  參考資料： <https://medium.com/@kstseng/lime-local-interpretable-model-agnostic-explanation-%E6%8A%80%E8%A1%93%E4%BB%8B%E7%B4%B9-a67b6c34c3f8>
 
