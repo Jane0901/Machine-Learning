@@ -251,3 +251,7 @@ plot(gg_v, xvar=xvar, panel=TRUE, partial=TRUE, alpha=.1)
 5. Fit a simple model, e.g. standard regression, predicting the predictions from the ML model with the m features, where observations are weighted by similarity to the to-be-explained observations.
 
   * 對摸擬樣本為如好酒的機率，對這組特徵進行加權迴歸，係數值越大的越重要。
+  
+##### 5.1 圖形解釋
+
+<img src="https://m-clark.github.io/introduction-to-machine-learning/introduction-to-machine-learning_files/figure-html/rf_lime_vis1_clean-1.svg">
