@@ -17,32 +17,20 @@ knitr::opts_chunk$set(echo = TRUE,eval=FALSE)
 
 <img src="http://topepo.github.io/caret/premade/TrainAlgo.png">
 
-<<<<<<< HEAD
 ### 1.啟用r平行運算
 
-=======
-### CPU平行運算
+#### CPU平行運算
 
-開始
->>>>>>> 031d1850db1b0732220db3b3621f1eb6ba992c3e
 ```{r}
 library(doParallel)
 cl = makeCluster(2)
 registerDoParallel(cl)
+#stopCluster(cl)關閉
 ```
 
-<<<<<<< HEAD
 ### 2.資料處理
 
-造出train/test data
-=======
-結束
-```{r, eval=F}
-stopCluster(cl)
-```
-
-### 切割資料
->>>>>>> 031d1850db1b0732220db3b3621f1eb6ba992c3e
+#### 切割資料
 
 ```{r}
 library(gplots)
@@ -186,7 +174,7 @@ results_rf = train(quality~.,
                    trControl = cv_opts,
                    tuneGrid = rf_opts,
                    localImp = T,
-                   ntree=100)
+                   ntree=10)
 results_rf
 ```
 
@@ -202,13 +190,13 @@ confusionMatrix(preds_rf, good_observed, positive='good')
 
 ### 5. 變數重要性衡量
 
-#### 1. VIMP
+#### 5.1 VIMP
 
 ```{r}
 varImp(results_rf)
 ```
 
-#### 2. Minimal depth
+#### 5.2 Minimal depth
 
 ```{r}
 library(randomForestExplainer)
@@ -216,7 +204,7 @@ plot_min_depth_distribution(results_rf$finalModel)
 plot_min_depth_interactions(results_rf$finalModel, k=7)
 ```
 
-#### 3. Other Measures
+#### 5.3 Other Measures
 
 參考資料：<https://cran.r-project.org/web/packages/randomForestExplainer/vignettes/randomForestExplainer.html>
 
@@ -229,6 +217,10 @@ plot_importance_ggpairs(multi_imps)
 
 參考資料：ggRandomForests <https://arxiv.org/pdf/1501.07196>
 
+xvar=gg_md$topvars[1:2]，表示取出前兩個最重要的變數。
+
+下圖中(10,0.75,紅)，表示有一瓶酒，他的酒精濃度為10，1000棵樹裡面有750棵說他是好的，但它實際上是壞的（紅色）。
+
 ```{r}
 # tibble causes problem so convert wine_train to standard df.
 library(ggRandomForests)
@@ -237,15 +229,31 @@ rf2 = rfsrc(formula = quality ~.,
             mtry = results_rf$finalModel$mtry)
 gg_v = gg_variable(rf2)
 gg_md = gg_minimal_depth(rf2)
-# We want the top two ranked minimal depth variables only
+gg_v
+gg_md
 xvar = gg_md$topvars[1:2]
 plot(gg_v, xvar=xvar, panel=TRUE, partial=TRUE, alpha=.1)
-plot_explanations(rf_explain)
 ```
 
 ### 7. LIME
 
-參考資料： <https://hyp.is/Y71xhgEtEemBKXsjotd-uw/m-clark.github.io/introduction-to-machine-learning/opening-the-black-box.html>
+LIME 想要解決的問題：能不能夠找到一個容易解釋的模型 g 解釋為什麼一個個體會被分類到f預測的類別。
+
+    概念：我們希望利用特徵去預測一個個體，可以得到一個複雜但預測準確的模型f，但是我們很難用一個簡單的模型且可解釋的模型逼近，因此我們需要利用「局部」；在個體的附近找出一個線性（簡單）的決策區域作為可解釋該個體的模型，這個決策模型在該個體附近的預測準確度與f相當，但在離該個體較遠的區域預測準確度就會大幅下降，這就是所謂的局部性。
+
+ 參考資料： <https://medium.com/@kstseng/lime-local-interpretable-model-agnostic-explanation-%E6%8A%80%E8%A1%93%E4%BB%8B%E7%B4%B9-a67b6c34c3f8>
+
+步驟：
+
+- Loss function: L(f,g,$\pi_{{x}_i}$) + $\Omega(g)$
+
+    f為複雜模型、g為可解釋模型（線性回歸），$\Omega(g)$為懲罰項希望g能簡單一點，越相似的個體，應該要給予可解釋模型與複雜模型間的誤差較重權重，因此會有一個計算「與${x}_i$相似與否」的核函數 $\pi_{{x}_i}$(kernel function)。
+
+- 擾動樣本：進行有意義的擾動（改變${x}_i$的幾個特徵值），產生新的輸入資料（${z}_i$這些新資料是局部性的）帶入你的模型來觀察輸出結果。
+
+-  min loss function : $\sum\pi_{{x}_i}(f(z)-g(z))^2+ \Omega(g)$
+
+- 利用g去跑原始資料得出變數的係數觀察之間的重要程度
 
 ```{r}
 set.seed(1234)
@@ -259,11 +267,12 @@ rf_explain = explain(sample_test,
                      rf_lime, 
                      n_features = 3,
                      feature_select = 'highest_weights',
-                     labels = 'Good')#error:y is constant; gaussian glmnet fails at standardization step
+                     labels = 'good')#error:y is constant; gaussian glmnet fails at standardization step
 plot_features(rf_explain)
+plot_explanations(rf_explain)
 ```
 
-
+記得對圖作解釋
 
 
 
@@ -271,4 +280,16 @@ plot_features(rf_explain)
 兩個問題：
 
 1. minimum depth 出現兩次，要怎麼算是他是第1/2/1.5次數
+
+假設森林只有一棵樹，在同一棵主樹裡，某變數的minimum depth出現在第一層和第二層，minimal depth mean(5-2處)是1.5
+
 2. interaction裡面unconditional term是什麼意思?
+
+
+
+
+
+
+
+
+
