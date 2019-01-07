@@ -42,13 +42,13 @@ when\ y_i=-1,\ (w^{T}x_{i}-(b-\delta))y_{i} & \geq & 0
 \end{eqnarray*}
 $$
 也就是：
-$$(w^Tx_i-b)y_i+\delta \geq 0$$
+$$(w^Tx_i-b)y_i-\delta \geq 0$$
 
 #### Algorithm Summary
 
 $$min_{\{w,b,\delta\}}\ \frac{1}{2}\|w\|^2$$
-$$s.t.\ (w^Tx_i-b)y_i+\delta\geq 0$$
+$$s.t.\ (w^Tx_i-b)y_i-\delta\geq 0$$
 If $(w^*,b^*,\delta^*)$ is a possible solution, $\lambda (w^*,b^*,\delta^*)$ for $\lambda>0$ will be a solution too. Therefore, we normalize $\delta=1$.
 
 $$min_{\{w,b,\delta\}}\ \frac{1}{2}\|w\|^2$$
-$$s.t.\ (w^Tx_i-b)y_i+1\geq 0$$
+$$s.t.\ (w^Tx_i-b)y_i-1\geq 0$$
