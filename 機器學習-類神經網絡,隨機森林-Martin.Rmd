@@ -1,0 +1,257 @@
+---
+title: "機器學習-類神經網絡，隨機森林"
+author: "林茂廷"
+date: "12/10/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,eval=FALSE)
+```
+
+
+
+## 機器學習步驟
+
+### 流程圖
+
+<img src="http://topepo.github.io/caret/premade/TrainAlgo.png">
+
+### CPU平行運算
+
+開始
+```{r}
+library(doParallel)
+cl = makeCluster(2)
+registerDoParallel(cl)
+```
+
+結束
+```{r, eval=F}
+stopCluster(cl)
+```
+
+### 切割資料
+
+```{r}
+library(gplots)
+library(caret)
+library(tidyverse)
+wine <- read.csv('~/Dropbox/M-team/ML/wine.csv')
+set.seed(1234) # so that the indices will be the same when re-run
+trainIndices = createDataPartition(wine$quality, p=.8, list=F)
+
+wine_train = wine %>% 
+  select(-X,-free.sulfur.dioxide, -density, -color, -white) %>% 
+  slice(trainIndices)
+
+wine_test = wine %>% 
+  select(-X,-free.sulfur.dioxide, -density,  -color, -white) %>% 
+  slice(-trainIndices)
+
+wine_trainplot = select(wine_train, -quality) %>% 
+  preProcess(method='range') %>% 
+  predict(newdata= select(wine_train, -quality))
+
+good_observed = wine_test$quality
+
+```
+
+
+## 類神經網絡(NNet)：
+
+參考資料：
+
+  - <https://topepo.github.io/caret/train-models-by-tag.html>
+  
+  - 所以的模型都先看一下train-model bt tag，來看一下基本設定，以及模型特有的東西。
+
+
+### 1. How the model is evaluated
+Here we choose: **k-fold Cross-validation**
+
+參考資料：<https://hyp.is/lc7vUNc6EeixLm87hkeo7A/m-clark.github.io/introduction-to-machine-learning/concepts.html>
+
+10-fold CV here
+```{r}
+cv_opts = trainControl(method='cv', number=10) # cross-validation 
+```
+
+### 2. Pre-processing setup  
+
+#### 2.1 What kind of data transformation is needed for the algorithm?
+
+NNL: data requires rescaling 
+
+method = "center" subtracts the mean ($mean(x)$) of the predictor's data (again from the data in x) from the predictor values while method = "scale" divides by the standard deviation ($sd(x)$).
+
+$$\hat{x}_i=\frac{x_i-mean(x)}{sd(x)}$$
+
+### 3. (Tuning) parameter set setup
+
+#### 3.1 What are the tuning parameters
+
+size: Number of hidden units
+
+decay: 如下式數值分析的$\eta$
+
+$$\theta_{i+1}=\theta_{i}-\eta\frac{\delta\ Objectivefun(\theta_i)}{\delta \theta}$$
+
+tuneLength=5 表示 size,decay 是個5x5的grid空間。
+
+```{r}
+results_nnet = train(quality~., 
+                     data=wine_train, 
+                     method='avNNet',
+                     trControl=cv_opts,
+                     tuneLength=5,
+                     preProcess=c('center', 'scale'),
+                     trace=F, 
+                     maxit=10)
+results_nnet
+ggplot(results_nnet)
+ggplot(results_nnet) +
+  labs(x='Number of Hidden Units') +
+  scale_x_continuous(breaks = c(1,3,5,7,9))
+preds_nnet = predict(results_nnet, wine_test)
+confusionMatrix(preds_nnet, good_observed, positive='good')
+
+
+#results_nnet1 = train(quality~., 
+                    # data=wine_train, 
+                     #method='mlpWeightDecayML',
+                     #trControl=cv_opts,
+                     #preProcess=c('center', 'scale'),
+                     #trace=F, 
+                     #maxit=10)
+#results_nnet1
+
+```
+
+<div class="alert alert-info">
+不一定要用tuneLength由電腦選grid[值]，也可改成如下的手動設定：
+```
+regreg_opts = expand.grid(size = seq(.1, 1, length = 5),
+                          decay = seq(.1, .5, length = 5)) 
+results_regreg = train( ...
+                        tuneGrid = regreg_opts)
+```
+</div>
+
+## 隨機森林
+
+參考資料：<https://topepo.github.io/caret/train-models-by-tag.html#Random_Forest>
+
+### 1. 概念
+
+#### 1.1 Decision tree classifier
+
+[Basic concept](https://medium.com/machine-learning-101/chapter-3-decision-trees-theory-e7398adac567): 非常清楚的說明
+
+[scikit code documentation](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier)
+
+#### 1.2 Random forest classifier
+
+給定一組training data，演算法會決定那一棵樹最適合它(?)。Random forest透過Boostrapping產生如1000個training data，每個用來找一棵最適合它的樹，最後以這1000顆樹來衡量它對真正test data的預測（採多數決）。
+
+### 2. Cross-Validation & Pre processing
+
+同前
+
+### 3. Tuning parameters
+
+mtry: 隨機選出來用來架構樹之節點的特徵變數個數
+
+> In addition, when splitting a node during the construction of the tree, the split that is chosen (即用什麼特徵變數來進一步分類) is no longer the best split among all features. Instead, the split that is picked is the best split among a random subset of the features. ...[scikit code documentation](https://scikit-learn.org/stable/modules/ensemble.html#forest)
+
+ntree: 透過Boostrapping來產生「找樹用的」training data(一組樣本找一顆)。
+
+```{r}
+
+rf_opts = data.frame(mtry=c(2:6))
+results_rf = train(quality~., 
+                   data = wine_train,
+                   method = 'rf',
+                   preProcess = c('center', 'scale'),
+                   trControl = cv_opts,
+                   tuneGrid = rf_opts,
+                   localImp = T,
+                   ntree=100)
+results_rf
+preds_rf = predict(results_rf, wine_test)
+preds_rf
+confusionMatrix(preds_rf, good_observed, positive='good')
+```
+
+### 4. 各別變數的重要性
+
+**參考資料**: <https://cran.rstudio.com/web/packages/randomForestExplainer/vignettes/randomForestExplainer.html>
+
+#### 4.1 基本概念
+```{r}
+varImp(results_rf)
+```
+
+
+#### 4.2 重要性與樹的結構關連
+
+```{r}
+library(randomForestExplainer)
+plot_min_depth_distribution(results_rf$finalModel)
+```
+
+#### 4.3 交叉項的重要性
+
+? 用來更加突顯某一變數帶給其他變數的重要性？
+
+```{r}
+plot_min_depth_interactions(results_rf$finalModel, k=7)
+
+multi_imps = measure_importance(results_rf$finalModel)
+plot_importance_ggpairs(multi_imps)
+
+```
+
+```{r}
+# https://arxiv.org/pdf/1501.07196
+# tibble causes problem so convert wine_train to standard df.
+library(ggRandomForests)
+rf2 = rfsrc(formula = quality ~., 
+            data = data.frame(wine_train),
+            mtry = results_rf$finalModel$mtry)
+gg_v = gg_variable(rf2)
+gg_md = gg_minimal_depth(rf2)
+
+# We want the top two ranked minimal depth variables only
+xvar = gg_md$topvars[1:2]
+plot(gg_v, xvar=xvar, panel=TRUE, partial=TRUE, alpha=.1)
+```
+
+### 5 LIME
+
+每一瓶酒
+
+1. Permute the data n times to create data with similar distributional properties to the original.
+  
+  * 創造相似的酒（特徵變化要符合原始資料特徴間的統計性質，如變異及相關程度）
+
+2. Get similarity scores of the permuted observations to the observations you wish to explain.
+
+  * 依相似度要計算與原本那瓶酒的 「相似度」，之後權重用。
+
+3. Make predictions with the permuted data based on the ML model.
+
+
+  * 對新樣本做ML分類。
+
+4. Select m features (e.g. forward selection, lasso) best describing the complex model outcome from the permuted data.
+
+  * 選擇一組你想理解對ML結果影響重要的特徵。
+
+5. Fit a simple model, e.g. standard regression, predicting the predictions from the ML model with the m features, where observations are weighted by similarity to the to-be-explained observations.
+
+  * 對摸擬樣本為如好酒的機率，對這組特徵進行加權迴歸，係數值越大的越重要。
+  
+##### 5.1 圖形解釋
+
+<img src="https://m-clark.github.io/introduction-to-machine-learning/introduction-to-machine-learning_files/figure-html/rf_lime_vis1_clean-1.svg">

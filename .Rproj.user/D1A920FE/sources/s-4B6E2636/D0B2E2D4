@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1543807361642.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "D0B2E2D4",
+    "lastKnownWriteTime" : 6,
+    "last_content_update" : 1543807361642,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "id" : "c0f6b68082eb48bcb968f06fdadcd9ca",
+        "name" : "results_nnet",
+        "title" : "results_nnet"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "object_explorer"
+}

@@ -1,0 +1,54 @@
+---
+title: "Supporting Vector Machines"
+author: "林茂廷"
+date: "1/7/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# SVM 
+
+## 概念
+
+Features: $x_i$, Outcome: $y_i\in {0,1}$, 
+
+  * supporting hyperplane (SupH): any $w,b,\delta$ that can satisfy $w^Tx_i\geq b+\delta$ iff $y_i>0$ and $w^Tx_i\leq b-\delta$ iff $y_i<0$. The equality holds for some points in each area, i.e. at least one point **touchs** each plane. 數學上兩個supporting hyperplanes可以寫成：
+  
+  $$supH_1: w^Tx=b+\delta$$
+  $$supH_2: w^Tx=b-\delta$$
+  
+  * separating hypoerplane (SepH): the hyperplane that lies in the middle of the two SupHs. 數學上Separating hyperplane可以寫成：
+  
+  $$w^Tx=b$$
+  
+  * margin: 兩個supHs的距離. 
+  
+目標在極大化margin，使Supporting hyperplane分割空間越清楚越好，數學上來說它等同於極小化$\|w\|$，故可以寫成：
+
+$$min_{\{w,b,\delta\}}\ \|w\|^2$$
+
+受限於：
+
+$$when\ (y_i=1,x_i),\ w^Tx_i-(b+\delta)\geq 0$$
+$$when\ (y_i=-1,x_i),\ w^Tx_i-(b-\delta)\leq 0$$
+他們等同於：
+
+$$\begin{eqnarray*}
+when\ y_i=1,\ (w^{T}x_{i}-(b+\delta))y_{i} & \geq & 0\\
+when\ y_i=-1,\ (w^{T}x_{i}-(b-\delta))y_{i} & \geq & 0
+\end{eqnarray*}
+$$
+也就是：
+$$(w^Tx_i-b)y_i-\delta \geq 0$$
+
+#### Algorithm Summary
+
+$$min_{\{w,b,\delta\}}\ \frac{1}{2}\|w\|^2$$
+$$s.t.\ (w^Tx_i-b)y_i-\delta\geq 0$$
+If $(w^*,b^*,\delta^*)$ is a possible solution, $\lambda (w^*,b^*,\delta^*)$ for $\lambda>0$ will be a solution too. Therefore, we normalize $\delta=1$.
+
+$$min_{\{w,b,\delta\}}\ \frac{1}{2}\|w\|^2$$
+$$s.t.\ (w^Tx_i-b)y_i-1\geq 0$$
