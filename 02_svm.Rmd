@@ -52,3 +52,63 @@ If $(w^*,b^*,\delta^*)$ is a possible solution, $\lambda (w^*,b^*,\delta^*)$ for
 
 $$min_{\{w,b,\delta\}}\ \frac{1}{2}\|w\|^2$$
 $$s.t.\ (w^Tx_i-b)y_i-1\geq 0$$
+Then do the Lagrange Multiplier.
+
+#### Kernel Function
+
+The whole discusstion above is about linear data, if not, we should mapping data to a higher dimension by Kernel Function.
+
+<img src="https://m-clark.github.io/introduction-to-machine-learning/introduction-to-machine-learning_files/figure-html/svm2d-1.svg" height="500" width="500">
+
+<img src="https://m-clark.github.io/introduction-to-machine-learning/img/svm3d.png" height="500" width="500">
+
+$$x_i^Tx_j\rightarrow\emptyset(x_i)^T\emptyset(x_j)$$
+
+The kernel function could be very complicated, but by inner product, it will be simple a lot.
+$$K(x_i,x_j)\rightarrow\emptyset(x_i)^T\emptyset(x_j)$$
+$$K(x_i,x_j)\rightarrow\exp(-\frac{\|x_i-x_j||^2}{2\sigma^2})$$
+
+### The Non-Separable case
+
+In real world, it is hard to find a optimal separating hyperplane(OSH), we need to insert a error term to handle the case that support vectors overlap with SupHs.
+
+$$w^Tx_i-b\leq-1+\xi_i\  \forall y_i=-1$$
+$$w^Tx_i-b\geq+1-\xi_i\  \forall y_i=+1$$
+$$\xi_i\geq0$$
+and made a cost function("c" is the weight of cost):
+
+$$cost = c(\sum_i\xi_i)^k$$
+then
+
+$$min\ \frac{1}{2}\|w\|^2+c(\sum_i\xi_i)^k$$
+$$s.t.\ (w^Tx_i-b)y_i-1+\xi_i\geq 0$$
+
+
+## R-code example
+
+### Cross-Validation & Pre processing
+
+as above
+
+### Tuning parameters
+
+the tuneLength is the number of errors allowed
+
+```{r}
+results_svm = train(quality~., 
+                    data=wine_train, 
+                    method='svmLinear2',
+                    preProcess=c('center', 'scale'), 
+                    trControl=cv_opts, 
+                    tuneLength=5,
+                    probability=TRUE)  # to get probs along with classifications
+
+results_svm
+```
+
+```{r}
+preds_svm = predict(results_svm, wine_test)
+confusionMatrix(preds_svm, good_observed, positive='good')
+```
+
+Reference：http://www.cmlab.csie.ntu.edu.tw/~cyy/learning/tutorials/SVM2.pdf
