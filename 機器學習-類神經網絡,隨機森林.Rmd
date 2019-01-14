@@ -9,8 +9,6 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE,eval=FALSE)
 ```
 
-
-
 ## 機器學習步驟
 
 ### 流程圖
@@ -183,6 +181,11 @@ confusionMatrix(preds_rf, good_observed, positive='good')
 varImp(results_rf)
 ```
 
+> 兩個問題：
+
+1. minimum depth 出現兩次，要怎麼算是他是第1/2/1.5次數
+2. interaction裡面unconditional term是什麼意思?
+
 ```{r}
 library(randomForestExplainer)
 plot_min_depth_distribution(results_rf$finalModel)
@@ -192,6 +195,8 @@ multi_imps = measure_importance(results_rf$finalModel)
 plot_importance_ggpairs(multi_imps)
 
 ```
+
+> 視覺化的圖，是預測的結果，若預測結果是0.8，表示Random Forest若有1000顆樹，有800顆樹認為他是好的，可是若看到是紅色的，表示本質上他是壞的，這樣就是不成功的預測。很順利的Random Forest就會把它分個很開，很成功。 
 
 ```{r}
 # https://arxiv.org/pdf/1501.07196
@@ -208,8 +213,27 @@ xvar = gg_md$topvars[1:2]
 plot(gg_v, xvar=xvar, panel=TRUE, partial=TRUE, alpha=.1)
 ```
 
+### LIME 用一個簡單的分類方式，去嘗試去彌補複雜模型的不易詮釋狀況。
 
-兩個問題：
+![https://via.hypothes.is/https://medium.com/@kstseng/lime-local-interpretable-model-agnostic-explanation-技術介紹-a67b6c34c3f8]
 
-1. minimum depth 出現兩次，要怎麼算是他是第1/2/1.5次數
-2. interaction裡面unconditional term是什麼意思?
+## LIME
+
+```{r}
+library(dplyr)
+
+set.seed(1234)
+sample_index = sample(1:nrow(wine_test), 5)
+sample_test = wine_test %>% 
+  slice(sample_index) %>% 
+  select(-quality)
+
+library(lime)
+rf_lime = lime(wine_train, results_rf)
+rf_explain = explain(sample_test, 
+                     rf_lime, 
+                     n_features = 3,
+                     feature_select = 'highest_weights',
+                     labels = 'Good')
+```
+
