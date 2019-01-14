@@ -17,27 +17,27 @@ knitr::opts_chunk$set(echo = TRUE,eval=FALSE)
 
 <img src="http://topepo.github.io/caret/premade/TrainAlgo.png">
 
-### CPU平行運算
+### 1.啟用r平行運算
 
-開始
+#### CPU平行運算
+
 ```{r}
 library(doParallel)
 cl = makeCluster(2)
 registerDoParallel(cl)
+#stopCluster(cl)關閉
 ```
 
-結束
-```{r, eval=F}
-stopCluster(cl)
-```
+### 2.資料處理
 
-### 切割資料
+#### 切割資料
 
 ```{r}
 library(gplots)
 library(caret)
 library(tidyverse)
 wine <- read.csv('~/Dropbox/M-team/ML/wine.csv')
+wine$quality=factor(wine$quality)
 set.seed(1234) # so that the indices will be the same when re-run
 trainIndices = createDataPartition(wine$quality, p=.8, list=F)
 
@@ -54,7 +54,6 @@ wine_trainplot = select(wine_train, -quality) %>%
   predict(newdata= select(wine_train, -quality))
 
 good_observed = wine_test$quality
-
 ```
 
 
@@ -175,26 +174,76 @@ results_rf = train(quality~.,
                    trControl = cv_opts,
                    tuneGrid = rf_opts,
                    localImp = T,
-                   ntree=100)
+                   ntree=10)
 results_rf
+```
+
+### 4. make confusionm matrix
+
+參考資料：<https://hyp.is/f2kmRgEUEemKAFeGta_7RA/m-clark.github.io/introduction-to-machine-learning/opening-the-black-box.html>
+
+```{r}
 preds_rf = predict(results_rf, wine_test)
 preds_rf
 confusionMatrix(preds_rf, good_observed, positive='good')
+```
+
+利用confusionMatrix觀察模型衡量指標（準確率、召回率．．．）並依照研究問題判斷模型適不適合。
+
+### 5. 變數重要性衡量
+
+**參考資料**: <https://cran.rstudio.com/web/packages/randomForestExplainer/vignettes/randomForestExplainer.html>
+
+#### 5.1 VIMP
+
+概念：利用特徵經過置換前與置換後的誤差影響，來衡量該特徵的重要性。
+
+步驟：
+
+1. 利用每棵樹的分類模型來預測自己的OOB樣本，並計算錯誤率。
+
+  * OOB：在建構每棵樹的時候，我們對訓練集使用了不同的bootstrap sample。所以對於每棵樹而言，大约有1/3的資料點是沒有參與該棵樹的生成，他們就是該棵樹的OOB样本。
+
+2. 對想了解該特徵重要性的特徵進行隨機打亂，例如：把各資料點的「酒精濃度」進行隨機打亂。
+
+3. 利用原隨機森林模型進行預測得到新的outcome。
+
+4. 計算每棵樹新的OOB樣本錯誤率。
+
+5. 對於每棵樹擾亂特徵前後所得到的錯誤率相減並平均。
+
+6. 得出因該特徵擾亂後而導致的平均誤差上升多少，越高代表該變數越重要。
+
+```{r}
 varImp(results_rf)
 ```
+
+#### 5.2 Minimal depth
+
+概念：每棵樹在生成每個節點時都會有一個特徵，在樹越上層（越淺）的特徵重要程度會越大，利用此特點來計算特徵的平均最小深度觀察特徵的重要性。
+
+補充：假設森林有兩棵樹，A樹中特徵「酒精濃度」出現在第一層，B樹中「酒精濃度」出現在第二層與第四層，那麼平均最小深度為($\frac{7}{3}$)
 
 ```{r}
 library(randomForestExplainer)
 plot_min_depth_distribution(results_rf$finalModel)
 plot_min_depth_interactions(results_rf$finalModel, k=7)
-
-multi_imps = measure_importance(results_rf$finalModel)
-plot_importance_ggpairs(multi_imps)
-
 ```
 
+#### 5.3 Other Measures
+
+參考資料：<https://cran.r-project.org/web/packages/randomForestExplainer/vignettes/randomForestExplainer.html>
+
 ```{r}
-# https://arxiv.org/pdf/1501.07196
+multi_imps = measure_importance(results_rf$finalModel)
+plot_importance_ggpairs(multi_imps)
+```
+
+### 6. 觀察兩兩變數之關係
+
+參考資料：ggRandomForests <https://arxiv.org/pdf/1501.07196>
+
+```{r}
 # tibble causes problem so convert wine_train to standard df.
 library(ggRandomForests)
 rf2 = rfsrc(formula = quality ~., 
@@ -202,14 +251,81 @@ rf2 = rfsrc(formula = quality ~.,
             mtry = results_rf$finalModel$mtry)
 gg_v = gg_variable(rf2)
 gg_md = gg_minimal_depth(rf2)
-
-# We want the top two ranked minimal depth variables only
-xvar = gg_md$topvars[1:2]
+gg_v
+gg_md
+xvar = gg_md$topvars[1:2]#表示取出前兩個最重要的變數。
 plot(gg_v, xvar=xvar, panel=TRUE, partial=TRUE, alpha=.1)
 ```
 
+圖中縱軸為模型判定為good的機率，每一個點代表一個資料點，顏色為該資料點的真實outcome，以點(10,0.75,紅)為例；表示有一瓶酒，其酒精濃度為10且1000棵樹裡面有750棵說他是good(0.75)，但它實際上是壞的（紅色）。
 
-兩個問題：
+### 7. LIME
 
-1. minimum depth 出現兩次，要怎麼算是他是第1/2/1.5次數
-2. interaction裡面unconditional term是什麼意思?
+LIME 想要解決的問題：找到一個容易解釋的模型 g 解釋為什麼一個個體會被分類到f預測的類別；f是依據什麼特徵來分類進一步了解各特徵的重要性。
+
+ 參考資料： <https://medium.com/@kstseng/lime-local-interpretable-model-agnostic-explanation-%E6%8A%80%E8%A1%93%E4%BB%8B%E7%B4%B9-a67b6c34c3f8>
+
+步驟：
+
+每一瓶酒
+
+1. Permute the data n times to create data with similar distributional properties to the original.
+  
+  * 創造相似的酒（特徵變化要符合原始資料特徴間的統計性質，如變異及相關程度）。
+  
+    擾動樣本：進行有意義的擾動（改變${x}_i$的幾個特徵值），產生新的輸入資料${z}_i$。
+
+2. Get similarity scores of the permuted observations to the observations you wish to explain.
+
+  * 依相似度要計算與原本那瓶酒的 「相似度」；與原資料的距離越近者給予的係數 $\pi_{{x}_i}$ 越大，之後權重用。
+
+3. Make predictions with the permuted data based on the ML model.
+
+
+  * 對新樣本(${z}_i$)做ML分類得到新樣本得預測結果g(z)。
+  
+4. Min loss function : $\sum\pi_{{x}_i}(f(z)-g(z))^2+ \Omega(g)$
+
+  * f(z)為真實outcome，$\Omega(g)$為懲罰項目的為希望g能簡單一點，$\pi_{{x}_i}$為「與${x}_i$相似與否」的核函數。極小化loss function 找出最適的g。
+
+4. Select m features (e.g. forward selection, lasso) best describing the complex model outcome from the permuted data.
+
+  * 選擇一組你想理解對ML結果影響重要的特徵。
+
+5. Fit a simple model, e.g. standard regression, predicting the predictions from the ML model with the m features, where observations are weighted by similarity to the to-be-explained observations.
+
+  * 對摸擬樣本${z}_i$與選好的幾個特徵進行加權迴歸(model g)，觀察各特徵係數值；係數值越大者越重要。
+
+因為LIME很吃電腦資源所以下例程式碼中只隨機挑選了5個case（5個資料點）進行LIME
+
+```{r}
+set.seed(1234)
+sample_index = sample(1:nrow(wine_test), 5)#隨機選取幾個case
+sample_test = wine_test %>% 
+  slice(sample_index) %>% 
+  select(-quality) #分別拿掉5個case的outcome
+library(lime)
+rf_lime = lime(wine_train, results_rf)#lime
+rf_explain = explain(sample_test, 
+                     rf_lime, 
+                     n_features = 3,#只看三種特徵的組合
+                     feature_select = 'highest_weights',
+                     labels = 'good')
+rf_explain#各case跑完lime的係數狀況
+plot_features(rf_explain)
+plot_explanations(rf_explain)
+```
+
+以case 1 為例：
+
+  * Probablity為預測good的機率 
+  * feature_weight為-0.15表示當「0.40 < volatile.acidity」時，每增加一單位酸度y便會造成減少0.16。
+  * \[y = \left\{\begin{array}{ll}
+                 bad, & \mbox{if $y<0$} \\  
+                 good, & \mbox{if $y>0$} \\  
+                \end{array} \right.\]
+  * Explanation為$R^2$
+
+
+
+
