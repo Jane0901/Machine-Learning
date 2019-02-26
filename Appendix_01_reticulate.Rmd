@@ -1,0 +1,30 @@
+---
+title: "Reticulate Setup"
+author: "林茂廷"
+date: "2/26/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Environment setup
+
+```{r}
+library(reticulate)
+use_python("/Users/martin/anaconda3/envs/course_webapp/bin/python",
+           required = T)
+use_condaenv("course_webapp")
+```
+
+## Google API Installation
+
+```{r, eval=FALSE}
+conda_install(envname="course_webapp",
+              c("google-api-python-client",
+                "google-auth-httplib2",
+                "google-auth-oauthlib"),
+              pip=TRUE)
+```
