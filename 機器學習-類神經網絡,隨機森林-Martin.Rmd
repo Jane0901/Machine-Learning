@@ -178,17 +178,37 @@ results_rf
 preds_rf = predict(results_rf, wine_test)
 preds_rf
 confusionMatrix(preds_rf, good_observed, positive='good')
+```
+
+### 4. 各別變數的重要性
+
+**參考資料**: <https://cran.rstudio.com/web/packages/randomForestExplainer/vignettes/randomForestExplainer.html>
+
+#### 4.1 基本概念
+```{r}
 varImp(results_rf)
 ```
 
+<<<<<<< HEAD:機器學習-類神經網絡,隨機森林.Rmd
 > 兩個問題：
 
 1. minimum depth 出現兩次，要怎麼算是他是第1/2/1.5次數
 2. interaction裡面unconditional term是什麼意思?
+=======
+
+#### 4.2 重要性與樹的結構關連
+>>>>>>> Martin:機器學習-類神經網絡,隨機森林-Martin.Rmd
 
 ```{r}
 library(randomForestExplainer)
 plot_min_depth_distribution(results_rf$finalModel)
+```
+
+#### 4.3 交叉項的重要性
+
+? 用來更加突顯某一變數帶給其他變數的重要性？
+
+```{r}
 plot_min_depth_interactions(results_rf$finalModel, k=7)
 
 multi_imps = measure_importance(results_rf$finalModel)
@@ -213,6 +233,7 @@ xvar = gg_md$topvars[1:2]
 plot(gg_v, xvar=xvar, panel=TRUE, partial=TRUE, alpha=.1)
 ```
 
+<<<<<<< HEAD:機器學習-類神經網絡,隨機森林.Rmd
 ### LIME 用一個簡單的分類方式，去嘗試去彌補複雜模型的不易詮釋狀況。
 
 ![https://via.hypothes.is/https://medium.com/@kstseng/lime-local-interpretable-model-agnostic-explanation-技術介紹-a67b6c34c3f8]
@@ -236,4 +257,33 @@ rf_explain = explain(sample_test,
                      feature_select = 'highest_weights',
                      labels = 'Good')
 ```
+=======
+### 5 LIME
 
+每一瓶酒
+
+1. Permute the data n times to create data with similar distributional properties to the original.
+  
+  * 創造相似的酒（特徵變化要符合原始資料特徴間的統計性質，如變異及相關程度）
+
+2. Get similarity scores of the permuted observations to the observations you wish to explain.
+
+  * 依相似度要計算與原本那瓶酒的 「相似度」，之後權重用。
+
+3. Make predictions with the permuted data based on the ML model.
+
+
+  * 對新樣本做ML分類。
+
+4. Select m features (e.g. forward selection, lasso) best describing the complex model outcome from the permuted data.
+
+  * 選擇一組你想理解對ML結果影響重要的特徵。
+
+5. Fit a simple model, e.g. standard regression, predicting the predictions from the ML model with the m features, where observations are weighted by similarity to the to-be-explained observations.
+
+  * 對摸擬樣本為如好酒的機率，對這組特徵進行加權迴歸，係數值越大的越重要。
+  
+##### 5.1 圖形解釋
+>>>>>>> Martin:機器學習-類神經網絡,隨機森林-Martin.Rmd
+
+<img src="https://m-clark.github.io/introduction-to-machine-learning/introduction-to-machine-learning_files/figure-html/rf_lime_vis1_clean-1.svg">

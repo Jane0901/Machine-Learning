@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # History files
 .Rhistory
 .Rapp.history
@@ -35,3 +36,9 @@ vignettes/*.pdf
 *.utf8.md
 *.knit.md
 .Rproj.user
+=======
+.DS_Store
+*.html
+.Rproj.user/*
+.Rproj.user/shared/*
+>>>>>>> Martin

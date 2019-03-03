@@ -29,6 +29,8 @@ library(ggplot2)
 
 # Regularized Regression
 ```{r}
+
+
 set.seed(1234) # so that the indices will be the same when re-run
 trainIndices = createDataPartition(wine$quality, p=.8, list=F)
 
@@ -123,3 +125,45 @@ preds_nnet = predict(results_nnet, wine_test)
 confusionMatrix(preds_nnet, good_observed, positive='good')
 ```
 
+# Support Vector Machines
+  
+  參考資料：https://goo.gl/cMRJLA
+  
+  - 主要概念：SVM把原始資料投影到更高維度的空間裡，使得原本在低維度找不到切分的點，變成在高維度能夠找到一個超平面(hyperplane)，去切分。
+  
+  <img src="https://m-clark.github.io/introduction-to-machine-learning/introduction-to-machine-learning_files/figure-html/svm2d-1.svg" height="500" width="500">
+
+  <img src="https://m-clark.github.io/introduction-to-machine-learning/img/svm3d.png" height="500" width="500">
+  
+  
+  - 而這個分界線會尋找最好的（距離兩分類最遠，也就是最明顯劃分）那個維度去切。
+
+## kernel function
+  
+  參考資料：https://goo.gl/APV7NP
+  
+## example  
+
+```{r}
+results_svm = train(quality~., 
+                    data=wine_train, 
+                    method='svmLinear2',
+                    preProcess=c('center', 'scale'), 
+                    trControl=cv_opts, 
+                    tuneLength=5,
+                    probability=TRUE)  # to get probs along with classifications
+
+results_svm
+```
+
+```{r}
+preds_svm = predict(results_svm, wine_test)
+confusionMatrix(preds_svm, good_observed, positive='good')
+```
+
+  - 優點：
+    - 1.各式樣的資料皆能有不錯的預測表現 
+    - 2.可以將變數做線性組合增強預測能力
+    
+  - 缺點：
+    - 黑箱作業（不知道其中到底使用了什麼樣的映射函數）
