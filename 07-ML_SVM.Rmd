@@ -1,17 +1,6 @@
----
-title: "Supporting Vector Machines"
-author: "林茂廷"
-date: "1/7/2019"
-output: html_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 # SVM 
 
-## 概念
+## 概念{-}
 
 Features: $x_i$, Outcome: $y_i\in {0,1}$, 
 
@@ -44,7 +33,7 @@ $$
 也就是：
 $$(w^Tx_i-b)y_i-\delta \geq 0$$
 
-#### Algorithm Summary
+#### Algorithm Summary{-}
 
 $$min_{\{w,b,\delta\}}\ \frac{1}{2}\|w\|^2$$
 $$s.t.\ (w^Tx_i-b)y_i-\delta\geq 0$$
@@ -54,7 +43,7 @@ $$min_{\{w,b,\delta\}}\ \frac{1}{2}\|w\|^2$$
 $$s.t.\ (w^Tx_i-b)y_i-1\geq 0$$
 Then do the Lagrange Multiplier.
 
-#### Kernel Function
+#### Kernel Function{-}
 
 The whole discusstion above is about linear data, if not, we should mapping data to a higher dimension by Kernel Function.
 
@@ -68,7 +57,7 @@ The kernel function could be very complicated, but by inner product, it will be 
 $$K(x_i,x_j)\rightarrow\emptyset(x_i)^T\emptyset(x_j)$$
 $$K(x_i,x_j)\rightarrow\exp(-\frac{\|x_i-x_j||^2}{2\sigma^2})$$
 
-### The Non-Separable case
+### The Non-Separable case{-}
 
 In real world, it is hard to find a optimal separating hyperplane(OSH), we need to insert a error term to handle the case that support vectors overlap with SupHs.
 
@@ -84,13 +73,13 @@ $$min\ \frac{1}{2}\|w\|^2+c(\sum_i\xi_i)^k$$
 $$s.t.\ (w^Tx_i-b)y_i-1+\xi_i\geq 0$$
 
 
-## R-code example
+## R-code example{-}
 
-### Cross-Validation & Pre processing
+### Cross-Validation & Pre processing{-}
 
 as above
 
-### Tuning parameters
+### Tuning parameters{-}
 
 the tuneLength is the number of errors allowed
 

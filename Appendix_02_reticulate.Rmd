@@ -1,16 +1,4 @@
----
-title: "Reticulate Setup"
-author: "林茂廷"
-date: "2/26/2019"
-output: html_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-
-## Environment setup
+# Python on RStudio
 
 ```{r}
 library(reticulate)
@@ -20,11 +8,7 @@ library(reticulate)
 conda_create("m-team-machine-learning")
 ```
 
-```{r}
-file.edit("/Library/Frameworks/R.framework/Resources/Rprofile.site")
-```
-
-## 找到Rprofile.site的R根目錄
+##### 找到Rprofile.site的R根目錄{-}
 
 ```{r}
 site_path = R.home(component = "home")
@@ -34,9 +18,10 @@ file.exists(fname)
 
 ```{r}
 file.edit(fname)
+#file.edit("/Library/Frameworks/R.framework/Resources/Rprofile.site")
 ```
 
-## 未來開python環境用法
+#### 未來開python環境用法{-}
 
 ```{r}
 library(reticulate)
@@ -45,7 +30,7 @@ use_python(Sys.getenv("condaPythonPath"),
 use_condaenv("m-team-machine-learning")
 ```
 
-## Google API Installation
+#### Google API Installation{-}
 
 <https://developers.google.com/api-client-library/python/start/installation> 
 
