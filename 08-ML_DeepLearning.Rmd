@@ -1,4 +1,110 @@
 # (PART) Part II: Unsupervised-Learning{-}
 
-# 待新增
+# Basic Understanding
+
+其目的是去對原始資料進行分類，以便了解資料內部結構。有別於監督式學習網絡，無監督式學習網絡在學習時並不知道其分類結果是否正確，亦即沒有受到監督式增強(告訴它何種學習是正確的)。其特點是僅對此種網絡提供輸入範例。而它會自己主動從這些範例中找出其潛在類別規則。當學習完成並經測試後，也能夠將之應用到新的案例上。
+
+* 監督式學習：資料已有標記，運用已標記資料來做訓練，所以模型評估講求準度。
+* 非監督式學習：資料沒有標記，從中找出擁有相同特徵的資料群，所以是找出資料間大致分布的趨勢，而沒有要預測的對象。
+
+### Cluster{-}
+
+分群是一種將資料分類成群的方法，為一種非監督式學習，也就是訓練資料沒有預先定義的標籤。其主要的目的在於找出資料中相似的幾個群聚，讓在同一個子集中的成員對象都有相似的一些屬性，常見的包括在坐標系中更加短的空間距離等。
+
+一般而言，分群法可以大致歸為兩大類：
+
+* 階層式分群法 (hierarchical clustering) : 群的數目可以由大變小(divisive hierarchical clustering)，或是由小變大(agglomerative hierarchical clustering)，來進群聚的合併或分裂，最後再選取最佳的群的數目。
+
+* 分割式分群法 (partitional clustering) : 先指定群的數目後，再用一套疊代的數學運算法，找出最佳的分群方式以及相關的群中心。
+
+常見的分法有K-平均演算法、階層式分群、混合模型。
+
+#### K-平均演算法{-}
+
+參考資料：
+
+- [K平均演算法 Clustering: K-means Algorithm](http://mropengate.blogspot.com/2015/06/ai-ch16-5-k-introduction-to-clustering.html)
+
+- [https://zh.wikipedia.org/wiki/K-平均算法](https://zh.wikipedia.org/wiki/K-%E5%B9%B3%E5%9D%87%E7%AE%97%E6%B3%95)
+
+##### 概念{-}
+
+把n個點劃分到k個聚類中，使得每個點都屬於離他最近的均值(聚類中心)對應的聚類，以之作為聚類的標準。
+
+這個問題在計算上是 [NP困難](https://zh.wikipedia.org/wiki/NP%E5%9B%B0%E9%9A%BE)，不過存在高效的 [啟發式演算法](https://zh.wikipedia.org/wiki/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2)。一般情況下，都使用效率比較高的啟發式演算法，它們能夠快速收斂於一個局部最優解。
+
+這些演算法通常類似於通過疊代最佳化方法處理高斯混合分布的最大期望演算法（EM演算法）。而且，它們都使用聚類中心來為資料建模；然而k-平均聚類傾向於在可比較的空間範圍內尋找聚類，期望-最大化技術卻允許聚類有不同的形狀。
+
+>聚類數目k是一個輸入參數，通常要進行特徵檢查以決定聚類數目。
+
+##### 演算法描述{-}
+
+已知觀測集(x1,x2,...,xn)，其中每個觀測都是一個d-維實向量，k-平均聚類要把這n個觀測劃分到k個集合中(k≤n),使得組內平方和（WCSS within-cluster sum of squares）最小。
+
+Min WCSS : $\sum\ ^k _{i=1} \sum\ _{x\in S _i} \|x-\mu_i \|^2$
+
+步驟一：分配(Assignment)
+
+將每個觀測分配到聚類中，使組內平方和(WCSS)達最小。因為這一平方和就是平方後的歐氏距離，所以很直觀地把觀測分配到離它最近得均值點即可。
+
+步驟二：更新(Update)
+
+計算上步得到聚類中每一聚類觀測值圖心，作為新均值點。
+
+交替進行的兩個步驟都會減小目標函式的值，並且分配方案只有有限種，所以演算法一定會收斂於某一（局部）最優解。
+
+#### 2-3 優缺點
+
+* 優點：
+
+1. 簡單好理解。
+2. 項目自動分配給群集。
+
+* 缺點：
+
+1. 收斂到局部最佳解，而不是整體最佳解。
+1. 聚類數目k是一個輸入參數，選擇不恰當的k值可能會導致糟糕的聚類結果，所以必須先預測集群數量（要檢查特徵）。
+3. 所有項目強制列入群集。
+4. 對極端值很敏感，但可用K-medians、K-medoids替代解決。
+
+
+#### Latent Variable Models{-}
+
+### Bagging{-}
+
+> 舉一個例子
+
+### Boosting{-}
+
+#### R Code Example{-}
+
+```{r}
+library(xgboost)
+modelLookup("xgbLinear")
+modelLookup("xgbTree")
+```
+
+```{r}
+xgb_opts = expand.grid(eta=c(.3,.4),
+                       max_depth=c(9, 12),
+                       colsample_bytree=c(.6,.8),
+                       subsample=c(.5,.75,1),
+                       nrounds=1000,
+                       min_child_weight=1,
+                       gamma=0)
+wine_train
+set.seed(1234)
+results_xgb = train(quality~.,  #the R code form m-clark has the object called 'good'. Be aware the variable name is different or not, and the technique are all the same
+                    data=wine_train, 
+                    method='xgbTree',
+                    preProcess=c('center', 'scale'), 
+                    trControl=cv_opts, 
+                    tuneGrid=xgb_opts)
+results_xgb
+preds_gb = predict(results_xgb, wine_test)
+confusionMatrix(preds_gb, good_observed, positive='Good')
+```
+
+
+### Stacking{-}
 
