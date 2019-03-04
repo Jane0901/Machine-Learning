@@ -1,15 +1,8 @@
----
-title: "Wine_ML"
-author: "Vvsy"
-date: "11/20/2018"
-output: html_document
----
+# k-nearest Neighbors
 
-```{r setup, include=FALSE}
+```{r, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-# k-nearest Neighbors
 
 ```{r}
 knn_opts = data.frame(k=c(seq(3, 11, 2), 25, 51, 101))
@@ -29,4 +22,3 @@ results_knn
 preds_knn = predict(results_knn, wine_test)
 confusionMatrix(preds_knn, good_observed, positive='good')
 ```
-
