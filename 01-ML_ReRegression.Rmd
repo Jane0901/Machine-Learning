@@ -1,11 +1,9 @@
----
-title: "Regularized Regression"
-author: "PoMingChen"
-date: "2019/3/4"
-output: html_document
----
+# (PART) Part I: Supervised-Learning{-}
 
-```{r setup, include=FALSE}
+
+# Regularized Regression
+
+```{r, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -14,7 +12,7 @@ wine <- read.csv("~/Dropbox/M-Team/ML/wine.csv")
 str(wine)
 ```
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 library(caret)
 library(tidyverse)
 library(glmnet)
@@ -25,7 +23,6 @@ library(ggplot2)
 
 ```
 
-# Regularized Regression
 ```{r}
 set.seed(1234) # so that the indices will be the same when re-run
 # 抽出80%樣本來train, output format is matrix
@@ -41,7 +38,7 @@ wine_test = wine %>%
   slice(-trainIndices)
 ```
 
-# check distribution after normalization
+## check distribution after normalization
 ```{r}
 wine_trainplot = select(wine_train, -quality) %>% 
   preProcess(method='range') %>% #標準化處理range =>  (x-min)/(max-min)
@@ -69,8 +66,9 @@ results_regreg = train(quality~.,
 results_regreg #kappa是一統計量指標衡量預測值與實質的差距
 ggplot(results_regreg)
 ```
-alpha=mixing percentage
-lambda=regularization parameter
+
+- alpha=mixing percentage
+- lambda=regularization parameter
 
 ```{r}
 preds_regreg = predict(results_regreg, wine_test)

@@ -1,31 +1,25 @@
----
-title: "機器學習-類神經網絡，隨機森林"
-author: "林茂廷"
-date: "12/10/2018"
-output: html_document
----
+# Trees and Forests
 
-## 隨機森林
 
 參考資料：<https://topepo.github.io/caret/train-models-by-tag.html#Random_Forest>
 
-### 1. 概念
+### 概念{-}
 
-#### 1.1 Decision tree classifier
+#### Decision tree classifier{-}
 
 [Basic concept](https://medium.com/machine-learning-101/chapter-3-decision-trees-theory-e7398adac567): 非常清楚的說明
 
 [scikit code documentation](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier)
 
-#### 1.2 Random forest classifier
+#### Random forest classifier{-}
 
 給定一組training data，演算法會決定那一棵樹最適合它(?)。Random forest透過Boostrapping產生如1000個training data，每個用來找一棵最適合它的樹，最後以這1000顆樹來衡量它對真正test data的預測（採多數決）。
 
-### 2. Cross-Validation & Pre processing
+### Cross-Validation & Pre processing{-}
 
 同前
 
-### 3. Tuning parameters
+### Tuning parameters{-}
 
 mtry: 隨機選出來用來架構樹之節點的特徵變數個數
 
@@ -49,37 +43,28 @@ preds_rf
 confusionMatrix(preds_rf, good_observed, positive='good')
 ```
 
-### 4. 各別變數的重要性
+### 各別變數的重要性{-}
 
 **參考資料**: <https://cran.rstudio.com/web/packages/randomForestExplainer/vignettes/randomForestExplainer.html>
 
-#### 4.1 基本概念
+#### 基本概念{-}
 ```{r}
 varImp(results_rf)
 ```
 
-<<<<<<< HEAD:機器學習-類神經網絡,隨機森林.Rmd
-> 兩個問題：
-
-1. minimum depth 出現兩次，要怎麼算是他是第1/2/1.5次數
-2. interaction裡面unconditional term是什麼意思?
-=======
-
-#### 4.2 重要性與樹的結構關連
->>>>>>> Martin:機器學習-類神經網絡,隨機森林-Martin.Rmd
+#### 重要性與樹的結構關連{-}
 
 ```{r}
 library(randomForestExplainer)
 plot_min_depth_distribution(results_rf$finalModel)
+plot_min_depth_interactions(results_rf$finalModel, k=7)
 ```
 
-#### 4.3 交叉項的重要性
+#### 4.3 交叉項的重要性{-}
 
 ? 用來更加突顯某一變數帶給其他變數的重要性？
 
 ```{r}
-plot_min_depth_interactions(results_rf$finalModel, k=7)
-
 multi_imps = measure_importance(results_rf$finalModel)
 plot_importance_ggpairs(multi_imps)
 
@@ -102,32 +87,7 @@ xvar = gg_md$topvars[1:2]
 plot(gg_v, xvar=xvar, panel=TRUE, partial=TRUE, alpha=.1)
 ```
 
-<<<<<<< HEAD:機器學習-類神經網絡,隨機森林.Rmd
-### LIME 用一個簡單的分類方式，去嘗試去彌補複雜模型的不易詮釋狀況。
-
-![https://via.hypothes.is/https://medium.com/@kstseng/lime-local-interpretable-model-agnostic-explanation-技術介紹-a67b6c34c3f8]
-
-## LIME
-
-```{r}
-library(dplyr)
-
-set.seed(1234)
-sample_index = sample(1:nrow(wine_test), 5)
-sample_test = wine_test %>% 
-  slice(sample_index) %>% 
-  select(-quality)
-
-library(lime)
-rf_lime = lime(wine_train, results_rf)
-rf_explain = explain(sample_test, 
-                     rf_lime, 
-                     n_features = 3,
-                     feature_select = 'highest_weights',
-                     labels = 'Good')
-```
-=======
-### 5 LIME
+### LIME{-}
 
 每一瓶酒
 
@@ -152,7 +112,34 @@ rf_explain = explain(sample_test,
 
   * 對摸擬樣本為如好酒的機率，對這組特徵進行加權迴歸，係數值越大的越重要。
   
-##### 5.1 圖形解釋
->>>>>>> Martin:機器學習-類神經網絡,隨機森林-Martin.Rmd
+#### 圖形解釋{-}
+
 
 <img src="https://m-clark.github.io/introduction-to-machine-learning/introduction-to-machine-learning_files/figure-html/rf_lime_vis1_clean-1.svg">
+
+#### 示範程式{-}
+
+```{r}
+set.seed(1234)
+sample_index = sample(1:nrow(wine_test), 5)
+sample_test = wine_test %>% 
+  slice(sample_index) %>% 
+  select(-good)
+
+library(lime)
+rf_lime = lime(wine_train, results_rf)
+rf_explain = explain(sample_test, 
+                     rf_lime, 
+                     n_features = 3,
+                     feature_select = 'highest_weights',
+                     labels = 'Good')
+```
+
+```{r}
+plot_features(rf_explain)
+```
+
+```{r}
+plot_explanations(rf_explain)
+```
+

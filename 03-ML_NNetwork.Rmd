@@ -1,21 +1,16 @@
----
-title: "NNET"
-author: "PoMingChen"
-date: "12/10/2018"
-output: html_document
----
+# Neutral Network
 
-```{r setup, include=FALSE}
+```{r, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE,eval=FALSE)
 ```
 
-## 機器學習步驟
+## 機器學習步驟{-}
 
-### 流程圖
+### 流程圖{-}
 
 <img src="http://topepo.github.io/caret/premade/TrainAlgo.png">
 
-### CPU平行運算
+#### CPU平行運算{-}
 
 開始
 ```{r}
@@ -29,7 +24,7 @@ registerDoParallel(cl)
 stopCluster(cl)
 ```
 
-### 切割資料
+### 切割資料{-}
 
 ```{r}
 library(gplots)
@@ -55,29 +50,27 @@ good_observed = wine_test$quality
 
 ```
 
-
-## 類神經網絡(NNet)：
-
 參考資料：
 
   - <https://topepo.github.io/caret/train-models-by-tag.html>
   
-  - 所以的模型都先看一下train-model bt tag，來看一下基本設定，以及模型特有的東西。
+  - 所以的模型都先看一下train-model by tag，來看一下基本設定，以及模型特有的東西。
 
 
-### 1. How the model is evaluated
+### How the model is evaluated{-}
 Here we choose: **k-fold Cross-validation**
 
 參考資料：<https://hyp.is/lc7vUNc6EeixLm87hkeo7A/m-clark.github.io/introduction-to-machine-learning/concepts.html>
 
-10-fold CV here
+
 ```{r}
+#10-fold CV here
 cv_opts = trainControl(method='cv', number=10) # cross-validation 
 ```
 
-### 2. Pre-processing setup  
+### Pre-processing setup{-}
 
-#### 2.1 What kind of data transformation is needed for the algorithm?
+#### What kind of data transformation is needed for the algorithm?{-}
 
 NNL: data requires rescaling 
 

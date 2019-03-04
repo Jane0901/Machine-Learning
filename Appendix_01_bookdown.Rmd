@@ -1,0 +1,9 @@
+# (APPENDIX) Appendix {-}
+
+# Offical tutorial
+
+1. [bookdown repo](https://github.com/rstudio/bookdown)
+
+2. [bookdown webpage](https://bookdown.org/yihui/bookdown/)
+
+3. For your convenience, you may open the minimal bookdown template in new project in RStudio whenever you want to write down a book. 

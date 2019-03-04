@@ -1,0 +1,47 @@
+--- 
+title: "A Minimal ML Example"
+author: "M-Team"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib]
+biblio-style: apalike
+link-citations: yes
+description: "This is a minimal example of using the bookdown package to build-up a ML reference book. The output format for this example is bookdown::gitbook."
+---
+
+# Basic tutorial
+
+[m-clark ML](https://m-clark.github.io/introduction-to-machine-learning/preface.html)
+
+## 新增章節方式
+
+1. `bookdown`是稍微改良強化的`rmarkdown`，可以用來生成電子書。
+
+2. 檔名固定為`X-filename.Rmd`，bookdown會自動按照阿拉伯數字(X)生成章節。
+
+3. `#` 表示新增標題，每當需要一個新的章節，即可開一個新的Rmd，第一行都是打一個`#`，且無需再留`yaml`
+
+- `#` 大標
+
+- `##` 次標。並依此類推
+
+- `{-}`，在`#`後面加上`{-}`，可以不顯示標題數字。可斟酌使用。
+
+    - 畢竟有時候看到`5.1.1.1`，有點煩躁 
+    
+<br>
+
+- 可以直接看任意一個檔案結構作為例子即可瞭解。
+
+4. 之後可以在個人的branch裡面整理好負責的章節，並且pull request到`bookdown_only`這個branch並且進行生成並發布到RStudio伺服器。
+
+5. 生成電子書指令：
+
+- `bookdown::render_book("local")` 可以在publish之前先本機生成，檢查一下有沒有要再改的地方。
+
+6. 發布電子書指令：
+
+- `bookdown::publish_book()`
+
+

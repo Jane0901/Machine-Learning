@@ -1,13 +1,4 @@
----
-title: "Wine_ML"
-author: "Vvsy"
-date: "11/20/2018"
-output: html_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+# ML_VV
 
 ```{r}
 wine <- read.csv("~/Dropbox/M-Team/ML/wine.csv")
@@ -27,7 +18,7 @@ library(ggplot2)
 
 ```
 
-# Regularized Regression
+##### Regularized Regression{-}
 ```{r}
 
 
@@ -82,7 +73,7 @@ The lower bound (and p-value) suggests we are statistically predicting better th
 confusionMatrix(preds_regreg, good_observed, positive='good', mode='prec_recall')
 ```
 
-# k-nearest Neighbors
+##### k-nearest Neighbors{-}
 
 ```{r}
 knn_opts = data.frame(k=c(seq(3, 11, 2), 25, 51, 101))
@@ -103,7 +94,7 @@ preds_knn = predict(results_knn, wine_test)
 confusionMatrix(preds_knn, good_observed, positive='good')
 ```
 
-# Neural networks
+##### Neural networks{-}
 
 ```{r}
 results_nnet = train(quality~., 
@@ -125,7 +116,7 @@ preds_nnet = predict(results_nnet, wine_test)
 confusionMatrix(preds_nnet, good_observed, positive='good')
 ```
 
-# Support Vector Machines
+##### Support Vector Machines{-}
   
   參考資料：https://goo.gl/cMRJLA
   
@@ -138,11 +129,11 @@ confusionMatrix(preds_nnet, good_observed, positive='good')
   
   - 而這個分界線會尋找最好的（距離兩分類最遠，也就是最明顯劃分）那個維度去切。
 
-## kernel function
+##### kernel function{-}
   
   參考資料：https://goo.gl/APV7NP
   
-## example  
+##### example{-}  
 
 ```{r}
 results_svm = train(quality~., 
