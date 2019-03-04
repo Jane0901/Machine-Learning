@@ -1,7 +1,7 @@
 ---
-title: "Wine_ML"
-author: "Vvsy"
-date: "11/20/2018"
+title: "Regularized Regression"
+author: "PoMingChen"
+date: "2019/3/4"
 output: html_document
 ---
 
@@ -17,12 +17,10 @@ str(wine)
 ```{r}
 library(caret)
 library(tidyverse)
-
 library(glmnet)
 library(class)
 library(randomForest)
 library(e1071)
-
 library(ggplot2)
 
 ```
@@ -85,47 +83,3 @@ The lower bound (and p-value) suggests we are statistically predicting better th
 ```{r}
 confusionMatrix(preds_regreg, good_observed, positive='good', mode='prec_recall')
 ```
-
-# k-nearest Neighbors
-
-```{r}
-knn_opts = data.frame(k=c(seq(3, 11, 2), 25, 51, 101))
-knn_opts
-
-results_knn = train(quality~., 
-                    data=wine_train, 
-                    method='knn',
-                    preProcess=c('center', 'scale'), 
-                    trControl=cv_opts,
-                    tuneGrid = knn_opts)
-
-results_knn
-```
-
-```{r}
-preds_knn = predict(results_knn, wine_test)
-confusionMatrix(preds_knn, good_observed, positive='good')
-```
-
-# Neural networks
-
-```{r}
-results_nnet = train(quality~., 
-                     data=wine_train, 
-                     method='avNNet',
-                     trControl=cv_opts, 
-                     preProcess=c('center', 'scale'),
-                     tuneLength=3, 
-                     trace=F, 
-                     maxit=3)
-results_nnet
-```
-```{r}
-ggplot(results_nnet)
-```
-
-```{r}
-preds_nnet = predict(results_nnet, wine_test)
-confusionMatrix(preds_nnet, good_observed, positive='good')
-```
-

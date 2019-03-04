@@ -106,6 +106,7 @@ results_svm = train(quality~.,
 results_svm
 ```
 
+
 ```{r}
 preds_svm = predict(results_svm, wine_test)
 confusionMatrix(preds_svm, good_observed, positive='good')
