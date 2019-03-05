@@ -34,7 +34,7 @@ description: "This is a minimal example of using the bookdown package to build-u
 
 - 可以直接看任意一個檔案結構作為例子即可瞭解。
 
-4. 之後可以在個人的branch裡面整理好負責的章節，並且pull request到`bookdown_only`這個branch並且進行生成並發布到RStudio伺服器。
+4. 之後個人開啟`bookdown_username`作為更改分支，並且在其中修改個人負責的檔案然後進行pull request到`bookdown_only`這個分支，可以減低許多版本控制衝突的問題。
 
 5. 生成電子書指令：
 
@@ -57,4 +57,23 @@ library(ggplot2)
 library(dplyr)
 ```
 
+## 資料集引入
+```{r}
+wine <- read.csv("~/Dropbox/M-Team/ML/wine.csv")
+str(wine)
+```
 
+```{r}
+set.seed(1234) # so that the indices will be the same when re-run
+# 抽出80%樣本來train, output format is matrix
+trainIndices = createDataPartition(wine$quality, p=.8, list=F) 
+
+# delete highly correlated free.sulfur and density
+wine_train = wine %>% 
+  select(-free.sulfur.dioxide, -density, -color, -white) %>% 
+  dplyr::slice(trainIndices)
+
+wine_test = wine %>% 
+  select(-free.sulfur.dioxide, -density, -color, -white) %>% 
+  dplyr::slice(-trainIndices)
+```
