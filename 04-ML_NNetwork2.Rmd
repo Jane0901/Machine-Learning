@@ -1,0 +1,128 @@
+# Neutral Network2
+
+```{r , include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,eval=FALSE)
+```
+
+## 機器學習步驟{-}
+
+### 流程圖{-}
+
+<img src="http://topepo.github.io/caret/premade/TrainAlgo.png">
+
+#### 啟用CPU平行運算{-}
+
+```{r}
+library(doParallel)
+cl = makeCluster(2)
+registerDoParallel(cl)
+#stopCluster(cl)關閉
+```
+
+#### 資料處理{-}
+
+```{r}
+library(gplots)
+library(caret)
+library(tidyverse)
+wine <- read.csv('~/Dropbox/M-team/ML/wine.csv')
+wine$quality=factor(wine$quality)
+set.seed(1234) # so that the indices will be the same when re-run
+trainIndices = createDataPartition(wine$quality, p=.8, list=F)
+
+wine_train = wine %>% 
+  select(-X,-free.sulfur.dioxide, -density, -color, -white) %>% 
+  slice(trainIndices)
+
+wine_test = wine %>% 
+  select(-X,-free.sulfur.dioxide, -density,  -color, -white) %>% 
+  slice(-trainIndices)
+
+wine_trainplot = select(wine_train, -quality) %>% 
+  preProcess(method='range') %>% 
+  predict(newdata= select(wine_train, -quality))
+
+good_observed = wine_test$quality
+```
+
+
+## 類神經網絡(NNet){-}
+
+參考資料：
+
+  - <https://topepo.github.io/caret/train-models-by-tag.html>
+  
+  - 所以的模型都先看一下train-model by tag，來看一下基本設定，以及模型特有的東西。
+
+
+### How the model is evaluated{-}
+Here we choose: **k-fold Cross-validation**
+
+參考資料：<https://hyp.is/lc7vUNc6EeixLm87hkeo7A/m-clark.github.io/introduction-to-machine-learning/concepts.html>
+
+- 10-fold CV here
+```{r}
+cv_opts = trainControl(method='cv', number=10) # cross-validation 
+```
+
+### Pre-processing setup{-}  
+
+#### What kind of data transformation is needed for the algorithm?{-}
+
+NNL: data requires rescaling 
+
+method = "center" subtracts the mean ($mean(x)$) of the predictor's data (again from the data in x) from the predictor values while method = "scale" divides by the standard deviation ($sd(x)$).
+
+$$\hat{x}_i=\frac{x_i-mean(x)}{sd(x)}$$
+
+### (Tuning) parameter set setup{-}
+
+#### What are the tuning parameters{-}
+
+size: Number of hidden units
+
+decay: 如下式數值分析的$\eta$
+
+$$\theta_{i+1}=\theta_{i}-\eta\frac{\delta\ Objectivefun(\theta_i)}{\delta \theta}$$
+
+tuneLength=5 表示 size,decay 是個5x5的grid空間。
+
+```{r}
+results_nnet = train(quality~., 
+                     data=wine_train, 
+                     method='avNNet',
+                     trControl=cv_opts,
+                     tuneLength=5,
+                     preProcess=c('center', 'scale'),
+                     trace=F, 
+                     maxit=10)
+results_nnet
+ggplot(results_nnet)
+ggplot(results_nnet) +
+  labs(x='Number of Hidden Units') +
+  scale_x_continuous(breaks = c(1,3,5,7,9))
+preds_nnet = predict(results_nnet, wine_test)
+confusionMatrix(preds_nnet, good_observed, positive='good')
+
+
+#results_nnet1 = train(quality~., 
+                    # data=wine_train, 
+                     #method='mlpWeightDecayML',
+                     #trControl=cv_opts,
+                     #preProcess=c('center', 'scale'),
+                     #trace=F, 
+                     #maxit=10)
+#results_nnet1
+
+```
+
+<div class="alert alert-info">
+不一定要用tuneLength由電腦選grid[值]，也可改成如下的手動設定：
+```
+regreg_opts = expand.grid(size = seq(.1, 1, length = 5),
+                          decay = seq(.1, .5, length = 5)) 
+results_regreg = train( ...
+                        tuneGrid = regreg_opts)
+```
+</div>
+

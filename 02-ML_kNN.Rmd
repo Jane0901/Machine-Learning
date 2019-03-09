@@ -1,0 +1,24 @@
+# k-nearest Neighbors
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+knn_opts = data.frame(k=c(seq(3, 11, 2), 25, 51, 101))
+knn_opts
+
+results_knn = train(quality~., 
+                    data=wine_train, 
+                    method='knn',
+                    preProcess=c('center', 'scale'), 
+                    trControl=cv_opts,
+                    tuneGrid = knn_opts)
+
+results_knn
+```
+
+```{r}
+preds_knn = predict(results_knn, wine_test)
+confusionMatrix(preds_knn, good_observed, positive='good')
+```

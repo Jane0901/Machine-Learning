@@ -1,0 +1,79 @@
+--- 
+title: "A Minimal ML Example"
+author: "M-Team"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib]
+biblio-style: apalike
+link-citations: yes
+description: "This is a minimal example of using the bookdown package to build-up a ML reference book. The output format for this example is bookdown::gitbook."
+---
+
+# Basic tutorial
+
+[m-clark ML](https://m-clark.github.io/introduction-to-machine-learning/preface.html)
+
+## 新增章節方式
+
+1. `bookdown`是稍微改良強化的`rmarkdown`，可以用來生成電子書。
+
+2. 檔名固定為`X-filename.Rmd`，bookdown會自動按照阿拉伯數字(X)生成章節。
+
+3. `#` 表示新增標題，每當需要一個新的章節，即可開一個新的Rmd，第一行都是打一個`#`，且無需再留`yaml`
+
+- `#` 大標
+
+- `##` 次標。並依此類推
+
+- `{-}`，在`#`後面加上`{-}`，可以不顯示標題數字。可斟酌使用。
+
+    - 畢竟有時候看到`5.1.1.1`，有點煩躁 
+    
+<br>
+
+- 可以直接看任意一個檔案結構作為例子即可瞭解。
+
+4. 之後個人開啟`bookdown_username`作為更改分支，並且在其中修改個人負責的檔案然後進行pull request到`bookdown_only`這個分支，可以減低許多版本控制衝突的問題。
+
+5. 生成電子書指令：
+
+- `bookdown::render_book("local")` 可以在publish之前先本機生成，檢查一下有沒有要再改的地方。
+
+6. 發布電子書指令：
+
+- `bookdown::publish_book()`
+
+## 環境設定
+
+```{r, warning=FALSE, message=FALSE}
+library(caret)
+library(tidyverse)
+library(glmnet)
+library(class)
+library(randomForest)
+library(e1071)
+library(ggplot2)
+library(dplyr)
+```
+
+## 資料集引入
+```{r}
+wine <- read.csv("~/Dropbox/M-Team/ML/wine.csv")
+str(wine)
+```
+
+```{r}
+set.seed(1234) # so that the indices will be the same when re-run
+# 抽出80%樣本來train, output format is matrix
+trainIndices = createDataPartition(wine$quality, p=.8, list=F) 
+
+# delete highly correlated free.sulfur and density
+wine_train = wine %>% 
+  select(-free.sulfur.dioxide, -density, -color, -white) %>% 
+  dplyr::slice(trainIndices)
+
+wine_test = wine %>% 
+  select(-free.sulfur.dioxide, -density, -color, -white) %>% 
+  dplyr::slice(-trainIndices)
+```

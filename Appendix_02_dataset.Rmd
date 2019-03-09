@@ -1,0 +1,21 @@
+# The Dataset
+
+```{r}
+wine <- read.csv("~/Dropbox/M-Team/ML/wine.csv")
+str(wine)
+```
+
+```{r}
+set.seed(1234) # so that the indices will be the same when re-run
+# 抽出80%樣本來train, output format is matrix
+trainIndices = createDataPartition(wine$quality, p=.8, list=F) 
+
+# delete highly correlated free.sulfur and density
+wine_train = wine %>% 
+  select(-free.sulfur.dioxide, -density, -color, -white) %>% 
+  dplyr::slice(trainIndices)
+
+wine_test = wine %>% 
+  select(-free.sulfur.dioxide, -density, -color, -white) %>% 
+  dplyr::slice(-trainIndices)
+```

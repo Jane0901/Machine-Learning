@@ -1,0 +1,145 @@
+# Trees and Forests
+
+
+參考資料：<https://topepo.github.io/caret/train-models-by-tag.html#Random_Forest>
+
+### 概念{-}
+
+#### Decision tree classifier{-}
+
+[Basic concept](https://medium.com/machine-learning-101/chapter-3-decision-trees-theory-e7398adac567): 非常清楚的說明
+
+[scikit code documentation](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier)
+
+#### Random forest classifier{-}
+
+給定一組training data，演算法會決定那一棵樹最適合它(?)。Random forest透過Boostrapping產生如1000個training data，每個用來找一棵最適合它的樹，最後以這1000顆樹來衡量它對真正test data的預測（採多數決）。
+
+### Cross-Validation & Pre processing{-}
+
+同前
+
+### Tuning parameters{-}
+
+mtry: 隨機選出來用來架構樹之節點的特徵變數個數
+
+> In addition, when splitting a node during the construction of the tree, the split that is chosen (即用什麼特徵變數來進一步分類) is no longer the best split among all features. Instead, the split that is picked is the best split among a random subset of the features. ...[scikit code documentation](https://scikit-learn.org/stable/modules/ensemble.html#forest)
+
+ntree: 透過Boostrapping來產生「找樹用的」training data(一組樣本找一顆)。
+
+```{r}
+rf_opts = data.frame(mtry=c(2:6))
+results_rf = train(quality~., 
+                   data = wine_train,
+                   method = 'rf',
+                   preProcess = c('center', 'scale'),
+                   trControl = cv_opts,
+                   tuneGrid = rf_opts,
+                   localImp = T,
+                   ntree=100)
+results_rf
+preds_rf = predict(results_rf, wine_test)
+preds_rf
+confusionMatrix(preds_rf, good_observed, positive='good')
+```
+
+### 各別變數的重要性{-}
+
+**參考資料**: <https://cran.rstudio.com/web/packages/randomForestExplainer/vignettes/randomForestExplainer.html>
+
+#### 基本概念{-}
+```{r}
+varImp(results_rf)
+```
+
+#### 重要性與樹的結構關連{-}
+
+```{r}
+library(randomForestExplainer)
+plot_min_depth_distribution(results_rf$finalModel)
+plot_min_depth_interactions(results_rf$finalModel, k=7)
+```
+
+#### 4.3 交叉項的重要性{-}
+
+? 用來更加突顯某一變數帶給其他變數的重要性？
+
+```{r}
+multi_imps = measure_importance(results_rf$finalModel)
+plot_importance_ggpairs(multi_imps)
+
+```
+
+> 視覺化的圖，是預測的結果，若預測結果是0.8，表示Random Forest若有1000顆樹，有800顆樹認為他是好的，可是若看到是紅色的，表示本質上他是壞的，這樣就是不成功的預測。很順利的Random Forest就會把它分個很開，很成功。 
+
+```{r}
+# https://arxiv.org/pdf/1501.07196
+# tibble causes problem so convert wine_train to standard df.
+library(ggRandomForests)
+rf2 = rfsrc(formula = quality ~., 
+            data = data.frame(wine_train),
+            mtry = results_rf$finalModel$mtry)
+gg_v = gg_variable(rf2)
+gg_md = gg_minimal_depth(rf2)
+
+# We want the top two ranked minimal depth variables only
+xvar = gg_md$topvars[1:2]
+plot(gg_v, xvar=xvar, panel=TRUE, partial=TRUE, alpha=.1)
+```
+
+### LIME{-}
+
+每一瓶酒
+
+1. Permute the data n times to create data with similar distributional properties to the original.
+  
+  * 創造相似的酒（特徵變化要符合原始資料特徴間的統計性質，如變異及相關程度）
+
+2. Get similarity scores of the permuted observations to the observations you wish to explain.
+
+  * 依相似度要計算與原本那瓶酒的 「相似度」，之後權重用。
+
+3. Make predictions with the permuted data based on the ML model.
+
+
+  * 對新樣本做ML分類。
+
+4. Select m features (e.g. forward selection, lasso) best describing the complex model outcome from the permuted data.
+
+  * 選擇一組你想理解對ML結果影響重要的特徵。
+
+5. Fit a simple model, e.g. standard regression, predicting the predictions from the ML model with the m features, where observations are weighted by similarity to the to-be-explained observations.
+
+  * 對摸擬樣本為如好酒的機率，對這組特徵進行加權迴歸，係數值越大的越重要。
+  
+#### 圖形解釋{-}
+
+
+<img src="https://m-clark.github.io/introduction-to-machine-learning/introduction-to-machine-learning_files/figure-html/rf_lime_vis1_clean-1.svg">
+
+#### 示範程式{-}
+
+```{r}
+set.seed(1234)
+sample_index = sample(1:nrow(wine_test), 5)
+sample_test = wine_test %>% 
+  slice(sample_index) %>% 
+  select(-good)
+
+library(lime)
+rf_lime = lime(wine_train, results_rf)
+rf_explain = explain(sample_test, 
+                     rf_lime, 
+                     n_features = 3,
+                     feature_select = 'highest_weights',
+                     labels = 'Good')
+```
+
+```{r}
+plot_features(rf_explain)
+```
+
+```{r}
+plot_explanations(rf_explain)
+```
+
