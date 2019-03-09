@@ -1,6 +1,6 @@
-# Neutral Network
+# Neutral Network2
 
-```{r, include=FALSE}
+```{r , include=FALSE}
 knitr::opts_chunk$set(echo = TRUE,eval=FALSE)
 ```
 
@@ -10,27 +10,23 @@ knitr::opts_chunk$set(echo = TRUE,eval=FALSE)
 
 <img src="http://topepo.github.io/caret/premade/TrainAlgo.png">
 
-#### CPU平行運算{-}
+#### 啟用CPU平行運算{-}
 
-開始
 ```{r}
 library(doParallel)
 cl = makeCluster(2)
 registerDoParallel(cl)
+#stopCluster(cl)關閉
 ```
 
-結束
-```{r, eval=F}
-stopCluster(cl)
-```
-
-### 切割資料{-}
+#### 資料處理{-}
 
 ```{r}
 library(gplots)
 library(caret)
 library(tidyverse)
 wine <- read.csv('~/Dropbox/M-team/ML/wine.csv')
+wine$quality=factor(wine$quality)
 set.seed(1234) # so that the indices will be the same when re-run
 trainIndices = createDataPartition(wine$quality, p=.8, list=F)
 
@@ -47,8 +43,10 @@ wine_trainplot = select(wine_train, -quality) %>%
   predict(newdata= select(wine_train, -quality))
 
 good_observed = wine_test$quality
-
 ```
+
+
+## 類神經網絡(NNet){-}
 
 參考資料：
 
@@ -62,13 +60,12 @@ Here we choose: **k-fold Cross-validation**
 
 參考資料：<https://hyp.is/lc7vUNc6EeixLm87hkeo7A/m-clark.github.io/introduction-to-machine-learning/concepts.html>
 
-
+- 10-fold CV here
 ```{r}
-#10-fold CV here
 cv_opts = trainControl(method='cv', number=10) # cross-validation 
 ```
 
-### Pre-processing setup{-}
+### Pre-processing setup{-}  
 
 #### What kind of data transformation is needed for the algorithm?{-}
 
@@ -78,6 +75,15 @@ method = "center" subtracts the mean ($mean(x)$) of the predictor's data (again 
 
 $$\hat{x}_i=\frac{x_i-mean(x)}{sd(x)}$$
 
+### (Tuning) parameter set setup{-}
+
+#### What are the tuning parameters{-}
+
+size: Number of hidden units
+
+decay: 如下式數值分析的$\eta$
+
+$$\theta_{i+1}=\theta_{i}-\eta\frac{\delta\ Objectivefun(\theta_i)}{\delta \theta}$$
 
 tuneLength=5 表示 size,decay 是個5x5的grid空間。
 
@@ -95,10 +101,6 @@ ggplot(results_nnet)
 ggplot(results_nnet) +
   labs(x='Number of Hidden Units') +
   scale_x_continuous(breaks = c(1,3,5,7,9))
-
-```
-
-```{r}
 preds_nnet = predict(results_nnet, wine_test)
 confusionMatrix(preds_nnet, good_observed, positive='good')
 

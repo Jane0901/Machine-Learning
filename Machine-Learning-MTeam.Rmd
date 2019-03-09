@@ -1,0 +1,278 @@
+--- 
+title: "A Minimal ML Example"
+author: "M-Team"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib]
+biblio-style: apalike
+link-citations: yes
+description: "This is a minimal example of using the bookdown package to build-up a ML reference book. The output format for this example is bookdown::gitbook."
+---
+
+# Basic tutorial
+
+Placeholder
+
+
+## 新增章節方式
+## 環境設定
+## 資料集引入
+
+<!--chapter:end:index.Rmd-->
+
+# (PART) Part I: Supervised-Learning{-}
+
+
+# Regularized Regression
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+wine <- read.csv("~/Dropbox/M-Team/ML/wine.csv")
+str(wine)
+```
+
+```{r}
+set.seed(1234) # so that the indices will be the same when re-run
+# 抽出80%樣本來train, output format is matrix
+trainIndices = createDataPartition(wine$quality, p=.8, list=F) 
+
+# delete highly correlated free.sulfur and density
+wine_train = wine %>% 
+  select(-free.sulfur.dioxide, -density, -color, -white) %>% 
+  dplyr::slice(trainIndices)
+
+wine_test = wine %>% 
+  select(-free.sulfur.dioxide, -density, -color, -white) %>% 
+  dplyr::slice(-trainIndices)
+```
+
+## check distribution after normalization{-}
+```{r}
+wine_trainplot = select(wine_train, -quality) %>% 
+  preProcess(method='range') %>% #標準化處理range =>  (x-min)/(max-min)
+  predict(newdata= select(wine_train, -quality)) #利用predict函數顯示出處理好的矩陣
+
+featurePlot(wine_trainplot, wine_train$quality, 'box')
+```
+
+
+```{r}
+# cross validation 10
+cv_opts = trainControl(method='cv', number=10) #定義模型訓練參數，劃分十組交叉驗證（使用repeatedcv可重複劃分）
+
+regreg_opts = expand.grid(.alpha = seq(.1, 1, length = 5),
+                          .lambda = seq(.1, .5, length = 5)) #25種組合(決定lamda重要度？)
+
+
+results_regreg = train(quality~., 
+                        data=wine_train,
+                        method = "glmnet", 
+                        trControl = cv_opts, 
+                        preProcess = c("center", "scale"), #指定數據標準化，"center"和"scale"。其中center表示預測變量減去均值
+                        tuneGrid = regreg_opts)
+
+results_regreg #kappa是一統計量指標衡量預測值與實質的差距
+ggplot(results_regreg)
+```
+
+- alpha=mixing percentage
+- lambda=regularization parameter
+
+```{r}
+preds_regreg = predict(results_regreg, wine_test)
+good_observed = wine_test$quality
+confusionMatrix(preds_regreg, good_observed, positive='good') 
+```
+
+The lower bound (and p-value) suggests we are statistically predicting better than the No Information Rate (i.e., just guessing the more prevalent ‘Bad’ category) -> 猜好的比猜壞的還強
+
+```{r}
+confusionMatrix(preds_regreg, good_observed, positive='good', mode='prec_recall')
+```
+
+<!--chapter:end:01-ML_ReRegression.Rmd-->
+
+# k-nearest Neighbors
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+knn_opts = data.frame(k=c(seq(3, 11, 2), 25, 51, 101))
+knn_opts
+
+results_knn = train(quality~., 
+                    data=wine_train, 
+                    method='knn',
+                    preProcess=c('center', 'scale'), 
+                    trControl=cv_opts,
+                    tuneGrid = knn_opts)
+
+results_knn
+```
+
+```{r}
+preds_knn = predict(results_knn, wine_test)
+confusionMatrix(preds_knn, good_observed, positive='good')
+```
+
+<!--chapter:end:02-ML_kNN.Rmd-->
+
+
+# Neutral Network2
+
+Placeholder
+
+
+## 機器學習步驟{-}
+### 流程圖{-}
+#### 啟用CPU平行運算{-}
+#### 資料處理{-}
+## 類神經網絡(NNet){-}
+### How the model is evaluated{-}
+### Pre-processing setup{-}  
+#### What kind of data transformation is needed for the algorithm?{-}
+### (Tuning) parameter set setup{-}
+#### What are the tuning parameters{-}
+
+<!--chapter:end:03-ML_NNetwork.Rmd-->
+
+
+# Trees and Forests2
+
+Placeholder
+
+
+## 隨機森林{-}
+### 概念{-}
+#### Decision tree classifier{-}
+#### Random forest classifier{-}
+### Cross-Validation & Pre processing{-}
+### Tuning parameters{-}
+### make confusionm matrix{-}
+### 變數重要性衡量{-}
+#### VIMP{-}
+#### Minimal depth{-}
+#### Other Measures{-}
+### 觀察兩兩變數之關係{-}
+### LIME{-}
+
+<!--chapter:end:04-ML_TreeForest.Rmd-->
+
+
+# SVM 
+
+Placeholder
+
+
+## 概念{-}
+#### Algorithm Summary{-}
+#### Kernel Function{-}
+### The Non-Separable case{-}
+## R-code example{-}
+### Cross-Validation & Pre processing{-}
+### Tuning parameters{-}
+
+<!--chapter:end:05-ML_SVM.Rmd-->
+
+
+# (PART) Part II: Unsupervised-Learning{-}
+
+Placeholder
+
+
+## Cluster{-}
+### K-平均演算法{-}
+#### 概念{-}
+#### 演算法描述{-}
+#### 優缺點{-}
+## Latent Variable Models{-}
+### 常見的分析手法{-}
+#### 背後關鍵的處理原則{-}
+#### PCA示範{-}
+## Graphical Structure{-}
+## Imputation{-}
+
+<!--chapter:end:06-ML_DeepLearning.Rmd-->
+
+
+# Ensembles
+
+Placeholder
+
+
+### Bagging{-}
+### Boosting{-}
+#### R Code Example{-}
+### Stacking{-}
+
+<!--chapter:end:07-ML_Ensembles.Rmd-->
+
+# (APPENDIX) Appendix {-}
+
+# Offical tutorial
+
+1. [bookdown repo](https://github.com/rstudio/bookdown)
+
+2. [bookdown webpage](https://bookdown.org/yihui/bookdown/)
+
+3. For your convenience, you may open the minimal bookdown template in new project in RStudio whenever you want to write down a book. 
+
+<!--chapter:end:Appendix_01_bookdown.Rmd-->
+
+# The Dataset
+
+```{r}
+wine <- read.csv("~/Dropbox/M-Team/ML/wine.csv")
+str(wine)
+```
+
+```{r}
+set.seed(1234) # so that the indices will be the same when re-run
+# 抽出80%樣本來train, output format is matrix
+trainIndices = createDataPartition(wine$quality, p=.8, list=F) 
+
+# delete highly correlated free.sulfur and density
+wine_train = wine %>% 
+  select(-free.sulfur.dioxide, -density, -color, -white) %>% 
+  dplyr::slice(trainIndices)
+
+wine_test = wine %>% 
+  select(-free.sulfur.dioxide, -density, -color, -white) %>% 
+  dplyr::slice(-trainIndices)
+```
+
+<!--chapter:end:Appendix_02_dataset.Rmd-->
+
+
+# Python on RStudio
+
+Placeholder
+
+
+##### 找到Rprofile.site的R根目錄{-}
+#### 未來開python環境用法{-}
+#### Google API Installation{-}
+
+<!--chapter:end:Appendix_03_reticulate.Rmd-->
+
+
+# ML_VV
+
+Placeholder
+
+
+##### Regularized Regression{-}
+##### k-nearest Neighbors{-}
+##### Neural networks{-}
+##### Support Vector Machines{-}
+##### kernel function{-}
+##### example{-}  
+
+<!--chapter:end:Appendix_04_ML_VV.Rmd-->
+
