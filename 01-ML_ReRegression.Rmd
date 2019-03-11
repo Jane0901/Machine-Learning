@@ -7,27 +7,40 @@
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
-wine <- read.csv("~/Dropbox/M-Team/ML/wine.csv")
-str(wine)
+#### 資料處理{-}
+```{r, include=FALSE}
+library(caret)
+library(tidyverse)
+library(glmnet)
+library(class)
+library(e1071)
+library(ggplot2)
 ```
 
+載入wine.csv資料，並切分成訓練資料及測試資料
 ```{r}
-set.seed(1234) # so that the indices will be the same when re-run
-# 抽出80%樣本來train, output format is matrix
-trainIndices = createDataPartition(wine$quality, p=.8, list=F) 
+wine <- read.csv("~/Dropbox/M-Team/ML/wine.csv")
 
-# delete highly correlated free.sulfur and density
+set.seed(1234) # so that the indices will be the same when re-run
+trainIndices = createDataPartition(wine$quality, p=.8, list=F)
+
 wine_train = wine %>% 
   select(-free.sulfur.dioxide, -density, -color, -white) %>% 
-  dplyr::slice(trainIndices)
+  slice(trainIndices)
 
 wine_test = wine %>% 
   select(-free.sulfur.dioxide, -density, -color, -white) %>% 
-  dplyr::slice(-trainIndices)
+  slice(-trainIndices)
 ```
 
 ## check distribution after normalization{-}
+
+### Pre-processing setup{-}
+
+The preprocess method here is: 
+$$\frac{x_i-min}{max-min}$$
+
+it looks like alcohol content and volatile acidity separate most with regard to the ‘good’ class.
 ```{r}
 wine_trainplot = select(wine_train, -quality) %>% 
   preProcess(method='range') %>% #標準化處理range =>  (x-min)/(max-min)
@@ -36,6 +49,15 @@ wine_trainplot = select(wine_train, -quality) %>%
 featurePlot(wine_trainplot, wine_train$quality, 'box')
 ```
 
+## Traning model
+
+### (Tuning) parameter set setup{-}
+
+The function "expand.grid", will create a grid of that number of values for each tuning parameter. 
+
+- alpha = mixing percentage, If we set the alpha to 1, it will present a standard lasso penalty, and 0 would be the ridge penalty.
+
+- lambda = This parameter can control the penalty amount.
 
 ```{r}
 # cross validation 10
@@ -56,8 +78,6 @@ results_regreg #kappa是一統計量指標衡量預測值與實質的差距
 ggplot(results_regreg)
 ```
 
-- alpha=mixing percentage
-- lambda=regularization parameter
 
 ```{r}
 preds_regreg = predict(results_regreg, wine_test)
@@ -67,6 +87,24 @@ confusionMatrix(preds_regreg, good_observed, positive='good')
 
 The lower bound (and p-value) suggests we are statistically predicting better than the No Information Rate (i.e., just guessing the more prevalent ‘Bad’ category) -> 猜好的比猜壞的還強
 
+<a href="https://stats.stackexchange.com/questions/82162/cohens-kappa-in-plain-english">What is "kappa"?</a>
+
+<a href="https://en.wikipedia.org/wiki/McNemar%27s_test">What is "McNemar's test"?</a>
 ```{r}
 confusionMatrix(preds_regreg, good_observed, positive='good', mode='prec_recall')
 ```
+## Strengths & Weaknesses
+
+Strengths
+
+  - 熟悉
+  
+  - standard/logistic regression好用常用
+  
+Weaknesses
+
+  - 不會自動找出相互影響的變數，或是非線性相關的回歸問題，在其他預測上就不太好用。
+  
+  - 變數需要被縮放，不然取值範圍相差過大會導致模型可能會更偏向於取值範圍較大的那個特徵。
+  
+  - 預測因子可能彼此相關。
