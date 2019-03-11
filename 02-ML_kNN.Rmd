@@ -4,14 +4,53 @@
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+#### 資料處理{-}
+```{r, include=FALSE}
+library(caret)
+library(tidyverse)
+library(glmnet)
+library(class)
+library(e1071)
+library(ggplot2)
+```
+
+載入wine.csv資料，並切分成訓練資料及測試資料
 ```{r}
+wine <- read.csv("~/Dropbox/M-Team/ML/wine.csv")
+
+set.seed(1234) # so that the indices will be the same when re-run
+trainIndices = createDataPartition(wine$quality, p=.8, list=F)
+
+wine_train = wine %>% 
+  select(-free.sulfur.dioxide, -density, -color, -white) %>% 
+  slice(trainIndices)
+
+wine_test = wine %>% 
+  select(-free.sulfur.dioxide, -density, -color, -white) %>% 
+  slice(-trainIndices)
+```
+
+## 概念{-}
+
+在分類酒品質好壞的例子中，藉由把其他變數以向量空間形式表示，針對欲分類的測試值Ａ，找出K個距離它最近的值，如果K個值中，多數為“好品質”，則我們也就假設Ａ也是“好品質”。
+
+此方法在補缺失值（類別）時是個不錯的方法。
+
+<a href="https://yihui.name/animation/example/knn-ani/">參考資料</a>
+
+
+```{r}
+# cross validation 10
+cv_opts = trainControl(method='cv', number=10) #定義模型訓練參數，劃分十組交叉驗證（使用repeatedcv可重複劃分
+
 knn_opts = data.frame(k=c(seq(3, 11, 2), 25, 51, 101))
 knn_opts
 
 results_knn = train(quality~., 
                     data=wine_train, 
                     method='knn',
-                    preProcess=c('center', 'scale'), 
+                    preProcess=c('center', 'scale'),
+                    #指定數據標準化，"center"和"scale"。其中center表示預測變量減去均值
                     trControl=cv_opts,
                     tuneGrid = knn_opts)
 
@@ -20,5 +59,26 @@ results_knn
 
 ```{r}
 preds_knn = predict(results_knn, wine_test)
+good_observed = wine_test$quality
 confusionMatrix(preds_knn, good_observed, positive='good')
 ```
+
+## Strengths & Weaknesses
+
+Strengths
+
+  - 直覺的方法
+  
+  - 對預測變量的離群值很強
+  
+Weaknesses
+
+  - 易受到不相干的特徵影響
+
+  - 能夠處理混和類型的資料
+
+  - 要預測的目標種類最好數量是差不多
+
+  - 資料大的情況下時間複雜度較高
+  
+雖然直覺好用，但根據上面的缺點，他的預測準確率是很差的，如果是機器學習初學者可以用，但隨著學的越多會發現有更多比這個好用的預測模型。

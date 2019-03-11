@@ -28,8 +28,7 @@ $$when\ (y_i=-1,x_i),\ w^Tx_i-(b-\delta)\leq 0$$
 $$\begin{eqnarray*}
 when\ y_i=1,\ (w^{T}x_{i}-(b+\delta))y_{i} & \geq & 0\\
 when\ y_i=-1,\ (w^{T}x_{i}-(b-\delta))y_{i} & \geq & 0
-\end{eqnarray*}
-$$
+\end{eqnarray*}$$
 也就是：
 $$(w^Tx_i-b)y_i-\delta \geq 0$$
 
