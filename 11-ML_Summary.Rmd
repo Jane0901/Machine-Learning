@@ -1,0 +1,43 @@
+# Summary 
+
+## Feature Selection & Importance
+
+前面在講這個主題時，介紹很多不同的方法去衡量各變數的代表性，進而決定它們是否重要。從某一方面來說，當我們在選擇資料集時，就已經是一個特徵選擇的過程，因為雖然我們會希望資料跟理想中的一樣完整，但事實上資料會因為用戶輸入習慣、隱私問題、時間限制...，各種因素使得資料有所限制。然而針對不同的資料需要有不同的處理模型。
+
+利用lasso係數的計算，非常不重要的變數最後權重可能為零，所以特徵選擇在模型預測非常重要。可以考慮各種方法，只要一個變數被排除時，預測的精準度明顯下降，就代表它很重要。
+
+以往時常仰賴統計分析的顯著性去決定變數是否重要，但忽略對預測影響。在機器學習的技術上，我們將更多重點轉移到預測這件事。所以對於沒有經驗的人來說，可能需要新的方式來思考如何衡量重要性。
+
+## Natural Language Processing/Text Analysis
+
+有些時候有興趣的數據非數字矩陣類型，而是文本的形式，做這類型的分析且文本資料很少時，大部分會花時間在資料整理上，這類數據的目的包含發現隱藏的主題、詞語標註、情感分析、語言辨識、運用字詞預測結果、檢查語句結構並使用網絡圖形呈現。機器學習也可運用在聲音，做語音辨識，深度學習更是廣泛。用R做的一些基本文字分析可以參考 [這個網站](https://m-clark.github.io/text-analysis-with-R/)。
+
+## Bayesian Approaches
+
+雖然本書大部分是以傳統的措辭去敘述，但要注意許多概念與技術都可以延伸到貝氏的觀念，甚至有些機器學習的技術就是在貝氏的邏輯下運作，像是線上學習（online learning）。然而貝氏估計的核心概念卻很難應用在大規模的資料上。
+
+## More Stuff
+
+機器學習還包含半監督式學習（semi-supervised learning）、線上學習（online learning）...
+
+## Cautionary Notes
+
+所有的機器學習模型都有假設，當假設不成立時它原先的結果可能就有問題。或是有可能模型Ａ在學習上勝於模型Ｂ，但模型Ｂ在有限的樣本下表現比模型Ａ好。在沒有任何前提下，不會有哪個模型一定比較好的情況，也不是越複雜的模型就比較好。正確的作法應該是了解資料特性，找到適合的模型，最後再透過交叉驗證進一步調整模型，讓模型進步。
+
+## Some Guidelines
+
+- More data beats a cleverer algorithm, but a lot of data is not enough by itself.
+
+- 避免過度配適。
+
+- Let the data speak for itself.
+
+- “Nothing is more practical than a good theory.”
+
+- While getting used to ML, it might be best to start from simpler approaches and then work towards more black box ones that require more tuning. For example, regularized logistic regression->random forest->your-fancy-technique. Don’t get too excited if you aren’t doing significantly better than a random forest with default settings.
+
+- Drawing up a visual diagram of your process is a good way to keep your analysis on the path to your goal. Some programs can even make this explicit.
+
+- Keep the tuning parameter/feature selection process separate from the final test process for assessing error.
+
+- Learn multiple models, selecting the best or possibly combining them.
