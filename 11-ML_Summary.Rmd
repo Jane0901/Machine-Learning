@@ -26,18 +26,20 @@
 
 ## Some Guidelines
 
-- More data beats a cleverer algorithm, but a lot of data is not enough by itself.
+- 在做分析時可以先畫一個流程圖，以確保分析時有朝向設定的目標。
+
+- 將選擇、調整特徵參數和最後的模型測試結果分開，避免評估錯誤。
+
+- 學習多個模型後，再選擇或是組合出一個最佳的模型。
+
+- 使用機器學習時，應該從最簡單的方法開始用起，再逐漸使用需要更多調整的模型。
+
+> Example：regularized logistic regression -> random forest -> your-fancy-technique. 
 
 - 避免過度配適。
+
+- More data beats a cleverer algorithm, but a lot of data is not enough by itself.
 
 - Let the data speak for itself.
 
 - “Nothing is more practical than a good theory.”
-
-- While getting used to ML, it might be best to start from simpler approaches and then work towards more black box ones that require more tuning. For example, regularized logistic regression->random forest->your-fancy-technique. Don’t get too excited if you aren’t doing significantly better than a random forest with default settings.
-
-- Drawing up a visual diagram of your process is a good way to keep your analysis on the path to your goal. Some programs can even make this explicit.
-
-- Keep the tuning parameter/feature selection process separate from the final test process for assessing error.
-
-- Learn multiple models, selecting the best or possibly combining them.
