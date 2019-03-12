@@ -1,4 +1,170 @@
 # (PART) Part II: Unsupervised-Learning{-}
 
-# 待新增
+# Basic on Unsupervised-Learning
+
+> 這個章節想要回答的是，非監督式學習他能幫助我們解決什麼問題？常見的使用場合是？
+
+其目的是去對原始資料進行分類，以便了解資料內部結構。有別於監督式學習網絡，無監督式學習網絡在學習時並不知道其分類結果是否正確，亦即沒有受到監督式增強(告訴它何種學習是正確的)。其特點是僅對此種網絡提供輸入範例。而它會自己主動從這些範例中找出其潛在類別規則。當學習完成並經測試後，也能夠將之應用到新的案例上。
+
+* 監督式學習：資料已有標記，運用已標記資料來做訓練，所以模型評估講求準度。
+* 非監督式學習：資料沒有標記，從中找出擁有相同特徵的資料群，所以是找出資料間大致分布的趨勢，而沒有要預測的對象。
+
+## Cluster{-}
+
+分群是一種將資料分類成群的方法，為一種非監督式學習，也就是訓練資料沒有預先定義的標籤。其主要的目的在於找出資料中相似的幾個群聚，讓在同一個子集中的成員對象都有相似的一些屬性，常見的包括在坐標系中更加短的空間距離等。
+
+一般而言，分群法可以大致歸為兩大類：
+
+* 階層式分群法 (hierarchical clustering) : 群的數目可以由大變小(divisive hierarchical clustering)，或是由小變大(agglomerative hierarchical clustering)，來進群聚的合併或分裂，最後再選取最佳的群的數目。
+
+* 分割式分群法 (partitional clustering) : 先指定群的數目後，再用一套疊代的數學運算法，找出最佳的分群方式以及相關的群中心。
+
+常見的分法有K-平均演算法、階層式分群、混合模型。
+
+### K-平均演算法{-}
+
+參考資料：
+
+- [https://zh.wikipedia.org/wiki/K-平均算法](https://zh.wikipedia.org/wiki/K-%E5%B9%B3%E5%9D%87%E7%AE%97%E6%B3%95)
+
+#### 概念{-}
+
+把n個點劃分到k個聚類中，使得每個點都屬於離他最近的均值(聚類中心)對應的聚類，以之作為聚類的標準。
+
+這個問題在計算上是 [NP困難](https://zh.wikipedia.org/wiki/NP%E5%9B%B0%E9%9A%BE)，不過存在高效的 [啟發式演算法](https://zh.wikipedia.org/wiki/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2)。一般情況下，都使用效率比較高的啟發式演算法，它們能夠快速收斂於一個局部最優解。
+
+這些演算法通常類似於通過疊代最佳化方法處理高斯混合分布的最大期望演算法（EM演算法）。而且，它們都使用聚類中心來為資料建模；然而k-平均聚類傾向於在可比較的空間範圍內尋找聚類，期望-最大化技術卻允許聚類有不同的形狀。
+
+> 聚類數目k是一個輸入參數，通常要進行特徵檢查以決定聚類數目。
+
+#### 演算法描述{-}
+
+已知觀測集(x1,x2,...,xn)，其中每個觀測都是一個d-維實向量，k-平均聚類要把這n個觀測劃分到k個集合中(k≤n),使得組內平方和（WCSS within-cluster sum of squares）最小。
+
+Min WCSS : $\sum\ ^k _{i=1} \sum\ _{x\in S _i} \|x-\mu_i \|^2$
+
+- 步驟一：分配(Assignment)
+
+首先，我們先對資料隨機取了k個資料點，當作一開始的中心，每一個資料點會去衡量他與這k個資料點的距離，並與最近者同群。此時即可達到第一次分群，使組內平方和(WCSS)達最小。
+
+- 步驟二：更新(Update)
+
+計算上步得到的每一個分群的觀測值中心，作為新均值點。需要留意的是，這個觀測值中心不見得恰好真的存在樣本。
+
+找到新的分群均值點之後再重新計算每一個樣本點與新的分群均值點的距離，有些樣本點會因此變換所屬群集。
+
+交替進行的兩個步驟都會減小目標函式的值，並且分配方案（k個群集）只有有限種，所以演算法一定會收斂於某一（局部）最優解。
+
+- [簡易圖文敘述](http://mropengate.blogspot.com/2015/06/ai-ch16-5-k-introduction-to-clustering.html)
+
+#### 優缺點{-}
+
+* 優點：
+
+1. 簡單好理解，目標函數極小化容易操作。
+2. 項目自動分配給群集。
+
+* 缺點：
+
+1. 收斂到局部最佳解，而不是整體最佳解。
+1. 聚類數目k是一個輸入參數，選擇不恰當的k值可能會導致糟糕的聚類結果，所以必須先預測集群數量（要檢查特徵）。
+3. 所有項目強制列入群集。
+4. 對極端值很敏感，但可用K-medians(中位數)、K-medoids(用真實資料點而非不一定存在的群集中心點）替代解決。
+
+    4.1 面對極端值時候，表示整個群集的分配並不是對稱鐘型，因此由組內平方和最小的目標函數求得的群集中心點並不能夠代表組內資料的中心，反而若用中位數或者特定的真實資料點可以解決這個問題。
+  
+    4.2 進一步值得注意的是，用特徵分群時建議檢查特徵資料分配狀況並做適當的轉換（像是log轉換，pre-processing變得重要）來達到分配的對稱性。否則，若有些特徵具有偏態有些則否，會讓K-means的分類效果變得不好。
+
+## Latent Variable Models{-}
+
+[Thinking about Latent Variables by Michael Clark](https://m-clark.github.io/sem/FA_notes.html)
+
+Latent Variable是一個很大的主題。多半是和降維有關，我如何用較少的變數來捕捉我想要觀察的東西，而且那個東西有時並不直觀，很多外顯的東西（indicator
+，指標或者訊號）能夠代表他，但始終無法代表他的全部。
+
+舉例來說，你如何衡量一個人有多快樂？快樂指數即可理解為一個latent variable
+
+- 他們是否在笑
+
+- 他們跟他人互動的情況如何
+
+### 常見的分析手法{-}
+
+- PCA 主成份分析
+
+- Factor Analysis
+
+#### 背後關鍵的處理原則{-}
+
+- Dimension Reduction/Data compression : 我如何盡可能用較少的變數以及觀測值並保持住我所想要資料特性（資料變異性）
+
+- Matrix Factorization: 我如何將一個大的矩陣，拆解成許多的小矩陣。
+
+- Latent Linear Models: 藉此彌補一個基本常用的Multi-OLS的不足。
+
+
+#### PCA示範{-}
+
+> we seek to find orthogonal (i.e. uncorrelated) factors to maximize the variance accounted for by each factor.
+
+>  [簡潔的PCA線性代數介紹](https://medium.com/@chih.sheng.huang821/%E6%A9%9F%E5%99%A8-%E7%B5%B1%E8%A8%88%E5%AD%B8%E7%BF%92-%E4%B8%BB%E6%88%90%E5%88%86%E5%88%86%E6%9E%90-principle-component-analysis-pca-58229cd26e71)
+
+PCA主成分的重點是要降維，同時保留原始資料最大的變異性。
+
+在機器學習上，若不提高維度則無法提升準確性，但維度提高到一定程度後對準確性的加分作用不大反而徒增困擾，因此我們需要降維。
+
+數學上，我們其實是將一個很大的矩陣，舉例一個政治傾向調查結果，拆解小矩陣相乘+誤差項，過程我們稱之為factor loading。
+
+其中小矩陣的rank(e.g. 3by3)，就代表你用了三個主成份來嘗試捕捉原本的矩陣，但是因為不會是100%，因此也是需要加上誤差項的原因。
+
+我可以透過trial and error的方式來嘗試知道哪一個主成分邊際代表的資料變異量較高（或較低），以及搭配應用上你想要達到多少的比例（e.g.原始資料的80%資料變異量），最後來決定你需要保留幾個主成分。
+
+主成分分析，有時候詮釋上並不容易，有時我們會稱為**xxx相關特徵**，但降維仍然是使用的第一目的。
+
+
+```{r}
+#我們透過五大面向的問題（各五題）來衡量一個人的人格特質。
+#Agreeableness
+#Conscientiousness
+#Openness to experience
+#Extraversion
+#Neuroticism
+library(psych)
+bfi
+bfi_trim = bfi %>% 
+  select(matches('A[1-5]|N[1-5]'))
+#Agreeableness and Neuroticism items were chosen 
+```
+
+```{r}
+pc = principal(bfi_trim, 2)
+```
+
+```{r}
+pc
+```
+
+重要的報表內容：
+
+- SS loadings: 就是小矩陣的eigenvalue，也就是資料的變異量
+
+- Proportion Var: 2.9/10 = 0.29，10是指當初做主成份分析原始的10個變數，總變異量就是10。
+
+- Cumulative Var：累積資料變異量
+
+- h2：原本有`A1~5` `N1~5`共10個變量。那最終降為到兩個主成份，請問這兩個主成份能夠解釋多少原本A1這個變數資料的變異性。
+
+- Loading，就是指那個主成份分析2 by 2的那個矩陣。又稱為pattern matrix，是兩個(10 by 2 matrix)轉置相乘。
+
+## Graphical Structure{-}
+
+非監督式學習用意是在找尋資料本身的大致的趨勢（pattern）或架構（structure），有些手法能夠用視覺化的方式（e.g.network analysis）來看到樣本間的關聯，包含誰跟誰較為相近等。
+
+進一步可以參考：[Graphical & Latent Variable Modeling by Michael clark](https://m-clark.github.io/sem/)
+
+## Imputation{-}
+
+當資料本身有缺失值的時候，也可以用非監督式學習的方式來計算推論可能的值。
+
+舉例來說，推薦系統即是用既有的用戶資料，以及與該用戶相近的其他使用者的購買狀況進行推論它可能會喜歡什麼。
 
