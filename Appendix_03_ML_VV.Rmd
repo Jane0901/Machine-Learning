@@ -1,0 +1,160 @@
+# ML_VV
+
+```{r}
+wine <- read.csv("~/Dropbox/M-Team/ML/wine.csv")
+str(wine)
+```
+
+```{r}
+library(caret)
+library(tidyverse)
+
+library(glmnet)
+library(class)
+library(randomForest)
+library(e1071)
+
+library(ggplot2)
+
+```
+
+##### Regularized Regression{-}
+```{r}
+
+
+set.seed(1234) # so that the indices will be the same when re-run
+trainIndices = createDataPartition(wine$quality, p=.8, list=F)
+
+wine_train = wine %>% 
+  select(-free.sulfur.dioxide, -density, -color, -white) %>% 
+  slice(trainIndices)
+
+wine_test = wine %>% 
+  select(-free.sulfur.dioxide, -density, -color, -white) %>% 
+  slice(-trainIndices)
+```
+
+```{r}
+wine_trainplot = select(wine_train, -quality) %>% 
+  preProcess(method='range') %>% #標準化處理range =>  (x-min)/(max-min)
+  predict(newdata= select(wine_train, -quality)) #利用predict函數顯示出處理好的矩陣
+
+featurePlot(wine_trainplot, wine_train$quality, 'box')
+```
+
+
+```{r}
+cv_opts = trainControl(method='cv', number=10) #定義模型訓練參數，劃分十組交叉驗證（使用repeatedcv可重複劃分）
+
+regreg_opts = expand.grid(.alpha = seq(.1, 1, length = 5),
+                          .lambda = seq(.1, .5, length = 5)) #25種組合(決定lamda重要度？)
+
+
+results_regreg = train(quality~., 
+                        data=wine_train,
+                        method = "glmnet", 
+                        trControl = cv_opts, 
+                        preProcess = c("center", "scale"), #指定數據標準化，"center"和"scale"。其中center表示預測變量減去均值
+                        tuneGrid = regreg_opts)
+
+results_regreg #kappa是一統計量指標衡量預測值與實質的差距
+ggplot(results_regreg)
+```
+
+```{r}
+preds_regreg = predict(results_regreg, wine_test)
+good_observed = wine_test$quality
+confusionMatrix(preds_regreg, good_observed, positive='good')
+```
+
+The lower bound (and p-value) suggests we are statistically predicting better than the No Information Rate (i.e., just guessing the more prevalent ‘Bad’ category) -> 猜好的比猜壞的還強
+
+```{r}
+confusionMatrix(preds_regreg, good_observed, positive='good', mode='prec_recall')
+```
+
+##### k-nearest Neighbors{-}
+
+```{r}
+knn_opts = data.frame(k=c(seq(3, 11, 2), 25, 51, 101))
+knn_opts
+
+results_knn = train(quality~., 
+                    data=wine_train, 
+                    method='knn',
+                    preProcess=c('center', 'scale'), 
+                    trControl=cv_opts,
+                    tuneGrid = knn_opts)
+
+results_knn
+```
+
+```{r}
+preds_knn = predict(results_knn, wine_test)
+confusionMatrix(preds_knn, good_observed, positive='good')
+```
+
+##### Neural networks{-}
+
+```{r}
+results_nnet = train(quality~., 
+                     data=wine_train, 
+                     method='avNNet',
+                     trControl=cv_opts, 
+                     preProcess=c('center', 'scale'),
+                     tuneLength=3, 
+                     trace=F, 
+                     maxit=3)
+results_nnet
+```
+```{r}
+ggplot(results_nnet)
+```
+
+```{r}
+preds_nnet = predict(results_nnet, wine_test)
+confusionMatrix(preds_nnet, good_observed, positive='good')
+```
+
+##### Support Vector Machines{-}
+  
+  參考資料：https://goo.gl/cMRJLA
+  
+  - 主要概念：SVM把原始資料投影到更高維度的空間裡，使得原本在低維度找不到切分的點，變成在高維度能夠找到一個超平面(hyperplane)，去切分。
+  
+  <img src="https://m-clark.github.io/introduction-to-machine-learning/introduction-to-machine-learning_files/figure-html/svm2d-1.svg" height="500" width="500">
+
+  <img src="https://m-clark.github.io/introduction-to-machine-learning/img/svm3d.png" height="500" width="500">
+  
+  
+  - 而這個分界線會尋找最好的（距離兩分類最遠，也就是最明顯劃分）那個維度去切。
+
+##### kernel function{-}
+  
+  參考資料：https://goo.gl/APV7NP
+  
+##### example{-}  
+
+```{r}
+results_svm = train(quality~., 
+                    data=wine_train, 
+                    method='svmLinear2',
+                    preProcess=c('center', 'scale'), 
+                    trControl=cv_opts, 
+                    tuneLength=5,
+                    probability=TRUE)  # to get probs along with classifications
+
+results_svm
+```
+
+```{r}
+preds_svm = predict(results_svm, wine_test)
+confusionMatrix(preds_svm, good_observed, positive='good')
+```
+
+  - 優點：
+    - 1.各式樣的資料皆能有不錯的預測表現 
+    - 2.可以將變數做線性組合增強預測能力
+    
+  - 缺點：
+    - 黑箱作業（不知道其中到底使用了什麼樣的映射函數）
