@@ -1,0 +1,13 @@
+# (PART) Part III: Deep-Learning{-}
+
+# Deep Learning
+
+>因為較難訓練這類的模型，所以一個模型就會被用到許多種情況上，這時候數據具有「comparable」的特性很重要。
+
+深度學習廣泛地運用在AI技術、臉部辨識、電腦視覺、語音辨識、自然語言處理（NLP）...。常用的技術包含前饋神經網路（Feed Forward Network）、卷積神經網路（Convolutional Neural Network）、循環神經網絡（Recurrent Neural Networks）、結構遞歸神經網絡（Recursive Neural Networks），經過前幾章已經了解了基本的神經網路外，下一步便是可以去學習以上這些神經網路。
+
+- Python套件：tensorflow、pytorch、keras。
+
+- R套件：sparklyr、keras。
+
+此書並未深入介紹深度學習，而是另外推薦 [深度學習的網站](http://deeplearning.net/)，作者只有將R及Python的小範例放在附件中。
