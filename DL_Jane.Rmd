@@ -274,9 +274,9 @@ print(model.predict(x_test))
 
 # 3.5 多元分類範例（Classifying newswires:a multiclass classification example）
 
-## 引入資料（The Reuters dataset）
+根據路透社在1986年出版的一些新聞，分類為46個主題。
 
-路透社在1986年出版的一些新聞主題，共46個。
+## 引入資料（The Reuters dataset）
 
 ###  Loading the Reuters dataset
 
@@ -286,18 +286,32 @@ from keras.datasets import reuters
 num_words=10000) #在資料中留下前10,000個最常出現的詞
 ```
 
-train_data:8982
-test_data:2246
-
-> how you can decode it back to words?
+```{python}
+# 8,982 training examples
+print(len(train_data))
+```
 
 ```{python}
+# 2,246 test examples
+print(len(test_data))
+```
+
+```{python}
+# each example is a list of integers (word indices)
+print(train_data[10])
+```
+
+```{python}
+# how you can decode it back to words?
 word_index = reuters.get_word_index()
 reverse_word_index = dict([(value, key) for (key, value) in word_index.items()])
 decoded_newswire = ' '.join([reverse_word_index.get(i - 3, '?') for i in
   train_data[0]]) # the indices are offset by 3 because 0, 1, and 2 are reserved indices for “padding,” “start of sequence,” and “unknown.”
 ```
 
+```{python}
+print(train_labels[10])
+```
 
 ## 處理資料（Preparing the data）
 
@@ -339,6 +353,10 @@ one_hot_test_labels = to_categorical(test_labels)
 ## 建神經網絡（Building your network）
 
 ### Model definition
+
+- You end the network with a `Dense` layer of size 46. This means for each input sample, the network will output a 46-dimensional vector. Each entry in this vector (each dimension) will encode a different output class.
+
+- The last layer uses a `softmax` activation. It means the network will output a probability distribution over the 46 different output classes—for every input sample, the network will produce a 46-dimensional output vector, where output[i] is the probability that the sample belongs to class i. The 46 scores will sum to 1.
 
 ```{python}
 from keras import models
@@ -448,8 +466,14 @@ predictions = model.predict(x_test)
 ```{python}
 # Each entry in predictions is a vector of length 46
 print(predictions[0].shape)
+```
+
+```{python}
 # The coefficients in this vector sum to 1
 print(np.sum(predictions[0]))
+```
+
+```{python}
 # The largest entry is the predicted class—the class with the highest probability
 print(np.argmax(predictions[0]))
 ```
