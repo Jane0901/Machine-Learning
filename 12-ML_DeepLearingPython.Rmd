@@ -1,5 +1,5 @@
 ---
-title: "Python_DeepLearning_3.4"
+title: "Python_DeepLearning_ch3"
 author: "PoMingChen"
 date: "3/19/2019"
 output: html_document
@@ -27,16 +27,9 @@ use_condaenv("m-team2")
 # print(model)
 ```
 
-### Layers
+#### Layers
 
-2. layer -> layers to be a model -> Loss function and Optimizer(under SGD)
-
-```{python}
-from keras import layers
-layer = layers.Dense(32, input_shape=(784,))
-
-print(layer)
-```
+layer -> layers to be a model -> Loss function and Optimizer(under SGD)
 
 ### Keras
 
@@ -80,7 +73,7 @@ same model as above defined using functionl API
 
 > If you’re seriousabout deep learning, you should set up a local workstation with one or more GPUs
 
-### 3.4 Classifying movie reviews: a binary classification example
+## 3.4 Classifying movie reviews: a binary classification example
 
 這不是子婷當初寒假跟我聊到的case！？
 
@@ -247,8 +240,6 @@ plt.legend()
 plt.show()
 ```
 
-It seems to be some problem on Listing 3.9 3.10 (the plots), so let's move on Listing 3.11
-
 #### Listing 3.11 Retraining the model from scratch
 ```{python}
 model = models.Sequential()
@@ -267,7 +258,7 @@ results = model.evaluate(x_test, y_test)
 model.predict(x_test)
 ```
 
-### 3.5 Classifying newswires: a multiclass classification example
+## 3.5 Classifying newswires: a multiclass classification example
 
 > 3.5 和3.4滿像
 
@@ -279,22 +270,131 @@ from keras.datasets import reuters
 ```{python}
 len(train_data)
 len(test_data)
+train_data[10]
+train_labels[10]
 ```
 
 #### Listing 3.14 (preparing the data)
 
 ```{python}
 import numpy as np
-def vectorize_sequences(sequences, dimension=10000):
+def vectorize_sequences(sequences, dimension=10000): 
   results = np.zeros((len(sequences), dimension))
   for i, sequence in enumerate(sequences):
     results[i, sequence] = 1.
   return results
+  
+#def是define的意思，就是定義一個函數。
 x_train = vectorize_sequences(train_data)
 x_test = vectorize_sequences(test_data)
 ```
 
+```{python}
+from keras.utils.np_utils import to_categorical
+one_hot_train_labels = to_categorical(train_labels)
+one_hot_test_labels = to_categorical(test_labels)
+```
+
+```{python}
+from keras import models
+from keras import layers
+
+model = models.Sequential()
+model.add(layers.Dense(64, activation='relu', input_shape=(10000,)))
+model.add(layers.Dense(64, activation='relu'))
+model.add(layers.Dense(46, activation='softmax'))
+#You end the network with a Dense layer of size 46. This means for each inputsample, the network will output a 46-dimensional vector
+#the softmax, It means the network will output a probability distribution over the 46 different output classes.
+#for every input sample, the network will produce a 46-dimensional output vector, where output[i] is the probability that the samplebelongs to class i. The 46 scores will sum to 1
+#舉例：一篇新聞進去，出來他會分類出，他屬於第一類政治的機率0.13，第二類體育0.08，依此類推，這46個項目加總是1，你可以從機率分配排序上知道他可能是哪一類的新聞。
+```
+
+model compiling
+```{python}
+model.compile(optimizer='rmsprop',loss='categorical_crossentropy',metrics=['accuracy'])
+```
+
+set apart 1000 sample as validation set
+```{python}
+x_val = x_train[:1000]
+partial_x_train = x_train[1000:]
+y_val = one_hot_train_labels[:1000]
+partial_y_train = one_hot_train_labels[1000:]
+```
+
+train the model(with Listing 3.18)
+```{python}
+history = model.fit(partial_x_train,
+                    partial_y_train,
+                    epochs=20,
+                    batch_size=512,
+                    validation_data=(x_val, y_val))
+```
+
+plot the result (training and validation loss)(Listing 3.19)
+```{python}
+import matplotlib.pyplot as plt
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+epochs = range(1, len(loss) + 1)
+plt.plot(epochs, loss, 'bo', label='Training loss')
+plt.plot(epochs, val_loss, 'b', label='Validation loss')
+plt.title('Training and validation loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.show()
+```
+
+plot the result (training and validation accuracy)(Listing 3.19)
+```{python}
+plt.clf()
+acc = history.history['acc']
+val_acc = history.history['val_acc']
+plt.plot(epochs, acc, 'bo', label='Training acc')
+plt.plot(epochs, val_acc, 'b', label='Validation acc')
+plt.title('Training and validation accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.show()
+```
+
 #### Listing 3.21 Retraining the model from scratch
+
+> After we do the training and validtion set, we find epochs = 9 is the best. (or we will get overfitted) 
+
+```{python}
+model = models.Sequential()
+model.add(layers.Dense(64, activation='relu', input_shape=(10000,)))
+model.add(layers.Dense(64, activation='relu'))
+model.add(layers.Dense(46, activation='softmax'))
+model.compile(optimizer='rmsprop',
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
+model.fit(partial_x_train,
+          partial_y_train,
+          epochs=9,
+          batch_size=512,
+          validation_data=(x_val, y_val))
+results = model.evaluate(x_test, one_hot_test_labels)
+results
+
+#0.7858414960459524 we tune the training set to its best performance, and let's see what will happen in new data.
+```
+
+#### Listing 3.22 Generating predictions for new data
+
+> 看看預測資料丟進去，他會預測這則新聞屬於哪一類的新聞。
+
+```{python}
+predictions = model.predict(x_test)
+predictions[0].shape #第一筆資料丟進去，他出來的是一個長度46的vector，表示對每一個新聞類別的機率分配是多少。
+np.sum(predictions[0]) #這46個新聞類別的機率總和是1
+np.argmax(predictions[0]) #他最有可能屬於哪一種類型的新聞
+```
+
+
 
 > 注意model.train & model.evaluate的差別。
 
@@ -310,10 +410,14 @@ x_test = vectorize_sequences(test_data)
 The only thing this approach would change is the choice of the loss function. The lossfunction used in listing 3.21, categorical_crossentropy, expects the labels to followa categorical encoding. With integer labels, you should use `sparse_categorical_crossentropy`:
 
 ```{python}
-model.compile(optimizer='rmsprop',loss='sparse_categorical_crossentropy',metrics=['acc'])
+model.compile(optimizer='rmsprop',
+              loss='sparse_categorical_crossentropy',
+              metrics=['acc'])
 ```
 
 #### 3.23 A model with an information bottleneck
+
+> 因為最終要變成一個46類別的機率分配，若是中間有任何一層的layer，他擁有的dimension(unit)太低，則反而會濾掉太多資訊，且不可逆。因此不要讓任何一層的dimension遠低於你最終的output的dimension
 
 ```{python}
 model = models.Sequential()
@@ -324,6 +428,20 @@ model.compile(optimizer='rmsprop',loss='categorical_crossentropy',metrics=['accu
 model.fit(partial_x_train,partial_y_train,epochs=20,batch_size=128,validation_data=(x_val, y_val))
 
 #重點是那個4，因為你在某一層壓縮到只剩下4個元素。這樣要在放到46個類別。所以就比較吃力。（注意一下要先執行完畢前面的程式）
+```
+
+## 3.6 Predicting house prices: a regression example
+
+the Boston pricing dataset
+
+```{python}
+from keras.datasets import boston_housing
+(train_data, train_targets), (test_data, test_targets) = boston_housing.load_data()
+```
+
+
+```{python}
+python
 ```
 
 
