@@ -1,3 +1,331 @@
+--- 
+title: "A Minimal ML Example"
+author: "M-Team"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib]
+biblio-style: apalike
+link-citations: yes
+description: "This is a minimal example of using the bookdown package to build-up a ML reference book. The output format for this example is bookdown::gitbook."
+---
+
+# Basic tutorial
+
+Placeholder
+
+
+## 新增章節方式
+## 環境設定
+## 資料集引入
+
+<!--chapter:end:index.Rmd-->
+
+
+# (PART) Part I: Supervised-Learning{-}
+
+Placeholder
+
+
+## check distribution after normalization{-}
+
+<!--chapter:end:01-ML_ReRegression.Rmd-->
+
+# k-nearest Neighbors
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+knn_opts = data.frame(k=c(seq(3, 11, 2), 25, 51, 101))
+knn_opts
+
+results_knn = train(quality~., 
+                    data=wine_train, 
+                    method='knn',
+                    preProcess=c('center', 'scale'), 
+                    trControl=cv_opts,
+                    tuneGrid = knn_opts)
+
+results_knn
+```
+
+```{r}
+preds_knn = predict(results_knn, wine_test)
+confusionMatrix(preds_knn, good_observed, positive='good')
+```
+
+<!--chapter:end:02-ML_kNN.Rmd-->
+
+
+# Neutral Network
+
+Placeholder
+
+
+## 機器學習步驟{-}
+### 流程圖{-}
+#### CPU平行運算{-}
+### 切割資料{-}
+### How the model is evaluated{-}
+### Pre-processing setup{-}
+#### What kind of data transformation is needed for the algorithm?{-}
+
+<!--chapter:end:03-ML_NNetwork.Rmd-->
+
+
+# Neutral Network2
+
+Placeholder
+
+
+## 機器學習步驟{-}
+### 流程圖{-}
+#### 啟用CPU平行運算{-}
+#### 資料處理{-}
+## 類神經網絡(NNet){-}
+### How the model is evaluated{-}
+### Pre-processing setup{-}  
+#### What kind of data transformation is needed for the algorithm?{-}
+### (Tuning) parameter set setup{-}
+#### What are the tuning parameters{-}
+
+<!--chapter:end:04-ML_NNetwork2.Rmd-->
+
+
+# Trees and Forests
+
+Placeholder
+
+
+### 概念{-}
+#### Decision tree classifier{-}
+#### Random forest classifier{-}
+### Cross-Validation & Pre processing{-}
+### Tuning parameters{-}
+### 各別變數的重要性{-}
+#### 基本概念{-}
+#### 重要性與樹的結構關連{-}
+#### 4.3 交叉項的重要性{-}
+### LIME{-}
+#### 圖形解釋{-}
+#### 示範程式{-}
+
+<!--chapter:end:05-ML_TreeForest1.Rmd-->
+
+
+# Trees and Forests2
+
+Placeholder
+
+
+## 隨機森林{-}
+### 概念{-}
+#### Decision tree classifier{-}
+#### Random forest classifier{-}
+### Cross-Validation & Pre processing{-}
+### Tuning parameters{-}
+### make confusionm matrix{-}
+### 變數重要性衡量{-}
+#### VIMP{-}
+#### Minimal depth{-}
+#### Other Measures{-}
+### 觀察兩兩變數之關係{-}
+### LIME{-}
+
+<!--chapter:end:06-ML_TreeForest2.Rmd-->
+
+
+# SVM 
+
+Placeholder
+
+
+## 概念{-}
+#### Algorithm Summary{-}
+#### Kernel Function{-}
+### The Non-Separable case{-}
+## R-code example{-}
+### Cross-Validation & Pre processing{-}
+### Tuning parameters{-}
+
+<!--chapter:end:07-ML_SVM.Rmd-->
+
+
+# (PART) Part II: Unsupervised-Learning{-}
+
+Placeholder
+
+
+## Cluster{-}
+### K-平均演算法{-}
+#### 概念{-}
+#### 演算法描述{-}
+#### 優缺點{-}
+## Latent Variable Models{-}
+### 常見的分析手法{-}
+#### 背後關鍵的處理原則{-}
+#### PCA示範{-}
+## Graphical Structure{-}
+## Imputation{-}
+
+<!--chapter:end:08-ML_DeepLearning.Rmd-->
+
+
+# Ensembles
+
+Placeholder
+
+
+### Bagging{-}
+### Boosting{-}
+#### R Code Example{-}
+### Stacking{-}
+
+<!--chapter:end:09-ML_Ensembles.Rmd-->
+
+# (PART) Part III: Deep-Learning{-}
+
+# Deep Learning
+
+>因為較難訓練這類的模型，所以一個模型就會被用到許多種情況上，這時候數據具有「comparable」的特性很重要。
+
+深度學習廣泛地運用在AI技術、臉部辨識、電腦視覺、語音辨識、自然語言處理（NLP）...。常用的技術包含前饋神經網路（Feed Forward Network）、卷積神經網路（Convolutional Neural Network）、循環神經網絡（Recurrent Neural Networks）、結構遞歸神經網絡（Recursive Neural Networks），經過前幾章已經了解了基本的神經網路外，下一步便是可以去學習以上這些神經網路。
+
+- Python套件：tensorflow、pytorch、keras。
+
+- R套件：sparklyr、keras。
+
+此書並未深入介紹深度學習，而是另外推薦 [深度學習的網站](http://deeplearning.net/)，作者只有將R及Python的小範例放在附件中。
+
+<!--chapter:end:10-ML_DeepLearning.Rmd-->
+
+
+# Summary 
+
+Placeholder
+
+
+## Feature Selection & Importance
+## Natural Language Processing/Text Analysis
+## Bayesian Approaches
+## More Stuff
+## Cautionary Notes
+## Some Guidelines
+
+<!--chapter:end:11-ML_Summary.Rmd-->
+
+# (APPENDIX) Appendix {-}
+
+# Offical tutorial
+
+1. [bookdown repo](https://github.com/rstudio/bookdown)
+
+2. [bookdown webpage](https://bookdown.org/yihui/bookdown/)
+
+3. For your convenience, you may open the minimal bookdown template in new project in RStudio whenever you want to write down a book. 
+
+<!--chapter:end:Appendix_01_bookdown.Rmd-->
+
+# The Dataset
+
+```{r}
+wine <- read.csv("~/Dropbox/M-Team/ML/wine.csv")
+str(wine)
+```
+
+```{r}
+set.seed(1234) # so that the indices will be the same when re-run
+# 抽出80%樣本來train, output format is matrix
+trainIndices = createDataPartition(wine$quality, p=.8, list=F) 
+
+# delete highly correlated free.sulfur and density
+wine_train = wine %>% 
+  select(-free.sulfur.dioxide, -density, -color, -white) %>% 
+  dplyr::slice(trainIndices)
+
+wine_test = wine %>% 
+  select(-free.sulfur.dioxide, -density, -color, -white) %>% 
+  dplyr::slice(-trainIndices)
+```
+
+<!--chapter:end:Appendix_02_dataset.Rmd-->
+
+
+# Python on RStudio
+
+Placeholder
+
+
+##### 找到Rprofile.site的R根目錄{-}
+#### 未來開python環境用法{-}
+#### Google API Installation{-}
+
+<!--chapter:end:Appendix_03_reticulate.Rmd-->
+
+
+# ML_VV
+
+Placeholder
+
+
+##### Regularized Regression{-}
+##### k-nearest Neighbors{-}
+##### Neural networks{-}
+##### Support Vector Machines{-}
+##### kernel function{-}
+##### example{-}  
+
+<!--chapter:end:Appendix_04_ML_VV.Rmd-->
+
+
+# Environment setup{-}
+
+Placeholder
+
+
+## 引入資料（The IMDB dataset）
+### Loading the IMDB dataset
+## 處理資料（Preparing the data）
+### Encoding the integer sequences into a binary matrix
+## 建神經網絡（Building your network）
+### The model definition
+### Compiling the model
+### Configuring the optimizer
+### Using custom losses and metrics
+## 驗證（Validating your approach）
+### Setting aside a validation set
+### Training your model
+### Plotting the training and validation loss
+### Plotting the training and validation accuracy
+### Retraining a model from scratch
+## 預測（Using a trained network to generate predictions on new data）
+## 可調參數 （Further experiments）
+## 引入資料（The Reuters dataset）
+###  Loading the Reuters dataset
+## 處理資料（Preparing the data）
+### Encoding the data
+### One-hot encoding
+## 建神經網絡（Building your network）
+### Model definition
+### Compiling the model
+## 驗證
+### Setting aside a validation set
+### Training the model
+### Plotting the training and validation loss
+### Plotting the training and validation accuracy
+### Retraining a model from scratch
+## 預測（Using a trained network to generate predictions on new data）
+## 可調參數 （Further experiments）
+## 其他課題
+### A different way to handle the labels and the loss
+### The importance of having sufficiently large intermediate layers
+## 引入資料（The Boston Housing Price dataset）
+###  Loading the Boston housing dataset
+
+<!--chapter:end:DL_Jane-martin.Rmd-->
+
 ---
 title: "Deep Learning"
 author: "陳宜榛"
@@ -534,14 +862,6 @@ predictions = model.predict(x_test)
 print(predictions[0].shape)
 ```
 
-```{r}
-py$predictions %>% class
-py$predictions -> predictions
-predictions[1,] %>%
-  {which(.==max(.))}
-predictions[1,] %>% View
-```
-
 ```{python}
 # The coefficients in this vector sum to 1
 print(np.sum(predictions[0]))
@@ -568,15 +888,7 @@ y_train = np.array(train_labels)
 y_test = np.array(test_labels)
 ```
 
-```{r}
-py$y_train %>% class
-py$y_train -> y_train
-y_train %>% head
-```
-
-<https://jovianlin.io/cat-crossentropy-vs-sparse-cat-crossentropy/>
-
-The only thing this approach would change is the choice of the loss function. So use sparse_categorical_crossentropy to deal with regular tensor labels.
+The only thing this approach would change is the choice of the loss function.
 
 ```{python}
 model.compile(optimizer='rmsprop',
@@ -608,3 +920,26 @@ validation_data=(x_val, y_val))
 ## 引入資料（The Boston Housing Price dataset）
 
 ###  Loading the Boston housing dataset
+
+<!--chapter:end:DL_Jane.Rmd-->
+
+
+
+## 非監督式學習（Unsupervised Learning）
+### 1. 概念
+### 2. 常使用的方法
+## 分群（Clustering）
+### 1. 概念
+### 2. K-平均演算法
+#### 2-1 概念
+#### 2-2 演算法描述
+#### 2-3 優缺點
+### 3. 階層式分群
+#### 3-1 概念
+### 4. 混合模型
+## 學習潛在變數模型的方法（Latent Variable Models）
+## 圖形結構（Graphical Structure）
+## 總結
+
+<!--chapter:end:Unsupervised-Learning.Rmd-->
+
