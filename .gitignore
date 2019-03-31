@@ -31,3 +31,4 @@ vignettes/*.pdf
 .Rproj.user/*
 .Rproj.user/shared/*
 Wombat.rstheme
+rstudio-panda
