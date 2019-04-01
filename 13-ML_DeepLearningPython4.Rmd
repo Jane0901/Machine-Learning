@@ -70,3 +70,65 @@ __how to justify the problem?__ if different randomshuffling rounds of the data 
 if different randomshuffling rounds of the data before splitting end up yielding very different measuresof model performance, then you’re having this issue. 
 
 #### K- fold validation
+
+#### iterated K-Fold validation with shuffling
+
+> applying K-fold validation multiple times, shuffling the data every time before splitting it K ways. The final score is the average of the scores obtained at each run of K-fold validation. Note that you end up training andevaluating P × K models (where P is the number of iterations you use)
+
+### 4.2.2 Things to keep in mind
+
+- Data representativeness 
+
+the training set and test set need to be representative of the dataset.
+
+> you usually should __randomly shuffle__ your data before splitting it into training and test sets.
+
+For example, you have the sample array for class(0~10), you should never put 80% above as training, or your test set will be all data within 9~10 class. (horrible)
+
+- the arrow of time
+
+for the weather forecast or stock market, or the time series data. You should not random the dataset for training and test.
+
+You should make sure all data in your test set is __posterior__ to the data in the training set.
+
+- redundancy for your data
+
+If some data points in your data appear twice (fairly common with real-world data), then shuffling the data and splitting it into a training set and a validation set will result in redundancy(多餘的) between the training and validation set.
+
+make sure the training set and validation set is disjoint.
+
+
+## 4.3 Data preprocessing, feature engineering, and feature learning
+
+For now, we’ll review the basics that are common to all datadomains.
+
+### 4.3.1 Data preprocessing for neural networks
+
+This includes `vectorization`, `normalization`, `handling missing values`, and `feature extraction`
+
+- vectorization
+
+Whatever data you need to process—sound,images, text—you must first __turn into tensors(in floating point data or integer)__, a step called data vectorization.
+
+- normalization
+
+> take small values and be homogenoeus(all features should take values in roughly the same range)
+
+> sometimes it's also helpful to normalize to mean-0 sd-1
+
+some features had small floating-point values, others had fairly large integer values. Before you fed this data into your network,you had to normalize each feature __independently__ so that it had a standard deviation of 1 and a mean of 0.
+
+- handling the missing value
+
+### 4.3.2 feature engineering
+
+Feature engineering is the process of using your own knowledge about the data and about the machine-learning algorithm at hand (in this case, a neural network) to make the algorithm work better by applying hardcoded (nonlearned) transformations to the data before it goes into the model. 
+
+舉例：想要判斷現在幾點？
+
+給照片像素深淺，未若於給指針相對位置，未若於給指針之於圓中央的角度。(page 125 figure 4.3)
+
+That’s the essence of feature engineering: making a problem easier by expressingit in a simpler way. It usually requires understanding the problem in depth.
+
+
+
