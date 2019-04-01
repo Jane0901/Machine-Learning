@@ -262,6 +262,8 @@ model.predict(x_test)
 
 > 3.5 和3.4滿像
 
+
+
 ```{python}
 from keras.datasets import reuters
 (train_data, train_labels), (test_data, test_labels) = reuters.load_data(num_words=10000)
@@ -444,6 +446,8 @@ from keras.datasets import boston_housing
 train_data.shape
 test_data.shape
 train_targets
+
+
 ```
 
 #### Preparing the data
