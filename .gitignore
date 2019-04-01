@@ -32,3 +32,4 @@ vignettes/*.pdf
 .Rproj.user/shared/*
 Wombat.rstheme
 rstudio-panda
+K-Fold-validation.png
