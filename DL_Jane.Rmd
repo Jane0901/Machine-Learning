@@ -793,10 +793,34 @@ print(test_mae_score)
 
 ## Supervised learning{-}
 
+應用在光學字元辨識、語音辨識、圖像分類、語言翻譯。非監督式學習除了分類、迴歸外，還有一些變種方式如下。
+
+- Sequence generation：給圖片，預測描述它的標題。Sequence generation can sometimes be reformulated as a series of classification problems (such as repeatedly predicting a word or token in a sequence).
+
+- Syntax tree prediction：給句子，predict its decomposition into a syntax
+tree.
+
+- Object detection：給圖片，在圖片中特定的目標畫出邊界。這也可表示成分類問題(given many candidate bounding boxes, classify the contents of each one)，或成為結合分類和迴歸的問題，也就是透過向量迴歸預測邊界座標。
+
+- Image segmentation：給圖片，draw a pixel-level mask on a specific object.
+
 ## Unsupervised learning{-}
 
+This branch of machine learning consists of finding interesting transformations of the input data without the help of any targets，用於資料視覺化(data visualization)、資料壓縮(data
+compression)、資料去噪(data denoising)，或者方便理解資料中存在的相關性。
+
+無監督式機器學習是數據分析的基礎，且在解決監督式學習的問題時，通常是更好摸索且進一步了解資料的必要步驟。像是降維(dimensionality reduction)或分群(clustering)便是常見的方法。
+ 
 ## Self-supervised learning{-}
 
+監督式學習中一個特定的實例，自監督學習是沒有人類去標籤的監督式學習，
+
+This is a specific instance of supervised learning, but it’s different enough that it deserves its own category. Self-supervised learning is supervised learning without human-annotated labels—you can think of it as supervised learning without any humans in the loop. There are still labels involved (because the learning has to be supervised by something), but they’re generaed from the input data, typically using a heuristic algorithm.
+ For instance, autoencoders are a well-known instance of self-supervised learning, where the generated targets are the input, unmodified. In the same way, trying to predict the next frame in a video, given past frames, or the next word in a text, given previous words, are instances of self-supervised learning (temporally supervised learning, in this case: supervision comes from future input data). Note that the distinction between supervised, self-supervised, and unsupervised learning can be blurry sometimes—these categories are more of a continuum without solid borders. Self-supervised learning can be reinterpreted as either supervised or unsupervised learning, depending on whether you pay attention to the learning mechanism or to the context of its application.
+
 ## Reinforcement learning{-}
+
+In reinforcement learning, an agent receives information about its environment and learns to choose actions that will maximize some reward. For instance, a neural network that “looks” at a videogame screen and outputs game actions in order to maximize its score can be trained via reinforcement learning.
+Currently, reinforcement learning is mostly a research area and hasn’t yet had significant practical successes beyond games. In time, however, we expect to see reinforcement learning take over an increasingly large range of real-world applications: self-driving cars, robotics, resource management, education, and so on. It’s an idea whose time has come, or will come soon. 
 
 # 4.2 Evaluating machine-learning models{-}
