@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Chapter 10 Ensembles | A Minimal ML Example</title>
+  <meta name="description" content="This is a minimal example of using the bookdown package to build-up a ML reference book. The output format for this example is bookdown::gitbook.">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+
+  <meta property="og:title" content="Chapter 10 Ensembles | A Minimal ML Example" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="This is a minimal example of using the bookdown package to build-up a ML reference book. The output format for this example is bookdown::gitbook." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 10 Ensembles | A Minimal ML Example" />
+  
+  <meta name="twitter:description" content="This is a minimal example of using the bookdown package to build-up a ML reference book. The output format for this example is bookdown::gitbook." />
+  
+
+<meta name="author" content="M-Team">
+
+
+<meta name="date" content="2019-03-06">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="basic-on-unsupervised-learning.html">
+<link rel="next" href="offical-tutorial.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceLine, a.sourceLine { display: inline-block; min-height: 1.25em; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; }
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+div.sourceLine, a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource div.sourceLine, .numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource div.sourceLine::before, .numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em; }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; color: #aaaaaa;  padding-left: 4px; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; color: initial; }
+}
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.bn { color: #40a070; } /* BaseN */
+code span.fl { color: #40a070; } /* Float */
+code span.ch { color: #4070a0; } /* Char */
+code span.st { color: #4070a0; } /* String */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.ot { color: #007020; } /* Other */
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.fu { color: #06287e; } /* Function */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code span.cn { color: #880000; } /* Constant */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.im { } /* Import */
+code span.va { color: #19177c; } /* Variable */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.op { color: #666666; } /* Operator */
+code span.bu { } /* BuiltIn */
+code span.ex { } /* Extension */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.at { color: #7d9029; } /* Attribute */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">A Minimal ML Example</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Basic tutorial</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#section-1.1"><i class="fa fa-check"></i><b>1.1</b> 新增章節方式</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#section-1.2"><i class="fa fa-check"></i><b>1.2</b> 環境設定</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#section-1.3"><i class="fa fa-check"></i><b>1.3</b> 資料集引入</a></li>
+</ul></li>
+<li class="part"><span><b>I Part I: Supervised-Learning</b></span></li>
+<li class="chapter" data-level="2" data-path="regularized-regression.html"><a href="regularized-regression.html"><i class="fa fa-check"></i><b>2</b> Regularized Regression</a><ul>
+<li class="chapter" data-level="" data-path="regularized-regression.html"><a href="regularized-regression.html#check-distribution-after-normalization"><i class="fa fa-check"></i>check distribution after normalization</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="k-nearest-neighbors.html"><a href="k-nearest-neighbors.html"><i class="fa fa-check"></i><b>3</b> k-nearest Neighbors</a></li>
+<li class="chapter" data-level="4" data-path="neutral-network.html"><a href="neutral-network.html"><i class="fa fa-check"></i><b>4</b> Neutral Network</a><ul>
+<li class="chapter" data-level="" data-path="neutral-network.html"><a href="neutral-network.html#e6a99fe599a8e5adb8e7bf92e6ada5e9a99f"><i class="fa fa-check"></i>機器學習步驟</a><ul>
+<li class="chapter" data-level="" data-path="neutral-network.html"><a href="neutral-network.html#e6b581e7a88be59c96"><i class="fa fa-check"></i>流程圖</a></li>
+<li class="chapter" data-level="" data-path="neutral-network.html"><a href="neutral-network.html#e58887e589b2e8b387e69699"><i class="fa fa-check"></i>切割資料</a></li>
+<li class="chapter" data-level="" data-path="neutral-network.html"><a href="neutral-network.html#how-the-model-is-evaluated"><i class="fa fa-check"></i>How the model is evaluated</a></li>
+<li class="chapter" data-level="" data-path="neutral-network.html"><a href="neutral-network.html#pre-processing-setup"><i class="fa fa-check"></i>Pre-processing setup</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="neutral-network2.html"><a href="neutral-network2.html"><i class="fa fa-check"></i><b>5</b> Neutral Network2</a><ul>
+<li class="chapter" data-level="" data-path="neutral-network2.html"><a href="neutral-network2.html#-1"><i class="fa fa-check"></i>機器學習步驟</a><ul>
+<li class="chapter" data-level="" data-path="neutral-network2.html"><a href="neutral-network2.html#-1"><i class="fa fa-check"></i>流程圖</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="neutral-network2.html"><a href="neutral-network2.html#nnet"><i class="fa fa-check"></i>類神經網絡(NNet)</a><ul>
+<li class="chapter" data-level="" data-path="neutral-network2.html"><a href="neutral-network2.html#how-the-model-is-evaluated-1"><i class="fa fa-check"></i>How the model is evaluated</a></li>
+<li class="chapter" data-level="" data-path="neutral-network2.html"><a href="neutral-network2.html#pre-processing-setup-1"><i class="fa fa-check"></i>Pre-processing setup</a></li>
+<li class="chapter" data-level="" data-path="neutral-network2.html"><a href="neutral-network2.html#tuning-parameter-set-setup"><i class="fa fa-check"></i>(Tuning) parameter set setup</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="trees-and-forests.html"><a href="trees-and-forests.html"><i class="fa fa-check"></i><b>6</b> Trees and Forests</a><ul>
+<li class="chapter" data-level="" data-path="trees-and-forests.html"><a href="trees-and-forests.html#e6a682e5bfb5"><i class="fa fa-check"></i>概念</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests.html"><a href="trees-and-forests.html#cross-validation-pre-processing"><i class="fa fa-check"></i>Cross-Validation &amp; Pre processing</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests.html"><a href="trees-and-forests.html#tuning-parameters"><i class="fa fa-check"></i>Tuning parameters</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests.html"><a href="trees-and-forests.html#e59084e588a5e8ae8ae695b8e79a84e9878de8a681e680a7"><i class="fa fa-check"></i>各別變數的重要性</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests.html"><a href="trees-and-forests.html#lime"><i class="fa fa-check"></i>LIME</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="trees-and-forests2.html"><a href="trees-and-forests2.html"><i class="fa fa-check"></i><b>7</b> Trees and Forests2</a><ul>
+<li class="chapter" data-level="" data-path="trees-and-forests2.html"><a href="trees-and-forests2.html#e99aa8e6a99fe6a3aee69e97"><i class="fa fa-check"></i>隨機森林</a><ul>
+<li class="chapter" data-level="" data-path="neutral-network2.html"><a href="neutral-network2.html#-1"><i class="fa fa-check"></i>概念</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests2.html"><a href="trees-and-forests2.html#cross-validation-pre-processing-1"><i class="fa fa-check"></i>Cross-Validation &amp; Pre processing</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests2.html"><a href="trees-and-forests2.html#tuning-parameters-1"><i class="fa fa-check"></i>Tuning parameters</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests2.html"><a href="trees-and-forests2.html#make-confusionm-matrix"><i class="fa fa-check"></i>make confusionm matrix</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests2.html"><a href="trees-and-forests2.html#e8ae8ae695b8e9878de8a681e680a7e8a1a1e9878f"><i class="fa fa-check"></i>變數重要性衡量</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests2.html"><a href="trees-and-forests2.html#e8a780e5af9fe585a9e585a9e8ae8ae695b8e4b98be9979ce4bf82"><i class="fa fa-check"></i>觀察兩兩變數之關係</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests2.html"><a href="trees-and-forests2.html#lime-1"><i class="fa fa-check"></i>LIME</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="svm.html"><a href="svm.html"><i class="fa fa-check"></i><b>8</b> SVM</a><ul>
+<li class="chapter" data-level="" data-path="svm.html"><a href="svm.html#-2"><i class="fa fa-check"></i>概念</a><ul>
+<li class="chapter" data-level="" data-path="svm.html"><a href="svm.html#the-non-separable-case"><i class="fa fa-check"></i>The Non-Separable case</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="svm.html"><a href="svm.html#r-code-example"><i class="fa fa-check"></i>R-code example</a><ul>
+<li class="chapter" data-level="" data-path="svm.html"><a href="svm.html#cross-validation-pre-processing-2"><i class="fa fa-check"></i>Cross-Validation &amp; Pre processing</a></li>
+<li class="chapter" data-level="" data-path="svm.html"><a href="svm.html#tuning-parameters-2"><i class="fa fa-check"></i>Tuning parameters</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>II Part II: Unsupervised-Learning</b></span></li>
+<li class="chapter" data-level="9" data-path="basic-on-unsupervised-learning.html"><a href="basic-on-unsupervised-learning.html"><i class="fa fa-check"></i><b>9</b> Basic on Unsupervised-Learning</a><ul>
+<li class="chapter" data-level="" data-path="basic-on-unsupervised-learning.html"><a href="basic-on-unsupervised-learning.html#cluster"><i class="fa fa-check"></i>Cluster</a><ul>
+<li class="chapter" data-level="" data-path="basic-on-unsupervised-learning.html"><a href="basic-on-unsupervised-learning.html#k-"><i class="fa fa-check"></i>K-平均演算法</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="basic-on-unsupervised-learning.html"><a href="basic-on-unsupervised-learning.html#latent-variable-models"><i class="fa fa-check"></i>Latent Variable Models</a><ul>
+<li class="chapter" data-level="" data-path="basic-on-unsupervised-learning.html"><a href="basic-on-unsupervised-learning.html#e5b8b8e8a68be79a84e58886e69e90e6898be6b395"><i class="fa fa-check"></i>常見的分析手法</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="basic-on-unsupervised-learning.html"><a href="basic-on-unsupervised-learning.html#graphical-structure"><i class="fa fa-check"></i>Graphical Structure</a></li>
+<li class="chapter" data-level="" data-path="basic-on-unsupervised-learning.html"><a href="basic-on-unsupervised-learning.html#imputation"><i class="fa fa-check"></i>Imputation</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="ensembles.html"><a href="ensembles.html"><i class="fa fa-check"></i><b>10</b> Ensembles</a><ul>
+<li class="chapter" data-level="" data-path="ensembles.html"><a href="ensembles.html#bagging"><i class="fa fa-check"></i>Bagging</a></li>
+<li class="chapter" data-level="" data-path="ensembles.html"><a href="ensembles.html#boosting"><i class="fa fa-check"></i>Boosting</a></li>
+<li class="chapter" data-level="" data-path="ensembles.html"><a href="ensembles.html#stacking"><i class="fa fa-check"></i>Stacking</a></li>
+</ul></li>
+<li class="appendix"><span><b>Appendix</b></span></li>
+<li class="chapter" data-level="A" data-path="offical-tutorial.html"><a href="offical-tutorial.html"><i class="fa fa-check"></i><b>A</b> Offical tutorial</a></li>
+<li class="chapter" data-level="B" data-path="the-dataset.html"><a href="the-dataset.html"><i class="fa fa-check"></i><b>B</b> The Dataset</a></li>
+<li class="chapter" data-level="C" data-path="python-on-rstudio.html"><a href="python-on-rstudio.html"><i class="fa fa-check"></i><b>C</b> Python on RStudio</a></li>
+<li class="chapter" data-level="D" data-path="ml-vv.html"><a href="ml-vv.html"><i class="fa fa-check"></i><b>D</b> ML_VV</a></li>
+<li class="divider"></li>
+<li><a href="https://sites.google.com/view/ntpu-mteam" target="blank">M-Team</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">A Minimal ML Example</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="ensembles" class="section level1">
+<h1><span class="header-section-number">Chapter 10</span> Ensembles</h1>
+<p>實用連結：</p>
+<ol style="list-style-type: decimal">
+<li><p><a href="https://becominghuman.ai/ensemble-learning-bagging-and-boosting-d20f38be9b1e">Ensemble Learning—Bagging and Boosting</a></p></li>
+<li><p><a href="https://medium.com/@rrfd/boosting-bagging-and-stacking-ensemble-methods-with-sklearn-and-mlens-a455c0c982de">Boosting, Bagging, and Stacking—Ensemble Methods with sklearn and mlens</a></p></li>
+<li><p><a href="https://medium.com/@chih.sheng.huang821/機器學習-ensemble-learning之bagging-boosting和adaboost-af031229ebc3">機器學習: Ensemble learning之Bagging、Boosting和AdaBoost</a></p></li>
+</ol>
+<br>
+<div style="color:tomato;">
+這跟非監督式學習還有關係嗎？
+</div>
+<p><br></p>
+<p>Ensembles中文稱作<strong>集成學習</strong>，意思是想辦法將多個預測模型合起來，然後預測效果（或分類）的表現可以勝過單一個模型。</p>
+<p>一個比較傳神的比喻是：</p>
+<ul>
+<li><p>每一個個別的機器學習模型都像是盲人摸象故事裡的盲人</p></li>
+<li><p>若能將盲人（個別模型）所看到的結果綜合起來，我就可以得知大象是長怎麼樣子（有良好的預測或分類表現）</p></li>
+</ul>
+<p>常見的手法即有以下三種：Bagging/Boosting/Stacking</p>
+<div id="bagging" class="section level3 unnumbered">
+<h3>Bagging</h3>
+<p>Bagging基本上就是Bootstrap aggregation。我透過不斷重新抽樣本並丟入模型（我們可以有多個模型並對其做訓練），透過反覆重抽，我可以觀察到資料本身的bias(the mean) &amp; variance(the standard deviation)</p>
+<p>最終取所有模型的預測表現之平均。藉此可以在不影響偏誤（bias）下，降低我預測結果的變異程度（variance）。</p>
+<p>至少我不會一次丟到靶心，下一次卻什麼也沒射中。</p>
+</div>
+<div id="boosting" class="section level3 unnumbered">
+<h3>Boosting</h3>
+<p>是一種多模型的接力使用。</p>
+<p>我會刻意放大A模型預測錯誤的地方之權重，並且做為接續之B模型的訓練重點。</p>
+<div id="r-code-example-1" class="section level4 unnumbered">
+<h4>R Code Example</h4>
+<pre class="sourceCode r" id="cb54"><code class="sourceCode r"><div class="sourceLine" id="cb54-1" data-line-number="1"><span class="co">#The following object is masked from ‘package:dplyr’:slice</span></div>
+<div class="sourceLine" id="cb54-2" data-line-number="2"><span class="co">#be aware the same slice function from two different package</span></div>
+<div class="sourceLine" id="cb54-3" data-line-number="3">    </div>
+<div class="sourceLine" id="cb54-4" data-line-number="4"><span class="kw">library</span>(xgboost)</div>
+<div class="sourceLine" id="cb54-5" data-line-number="5"><span class="kw">modelLookup</span>(<span class="st">&quot;xgbLinear&quot;</span>)</div>
+<div class="sourceLine" id="cb54-6" data-line-number="6"><span class="kw">modelLookup</span>(<span class="st">&quot;xgbTree&quot;</span>)</div></code></pre>
+<pre class="sourceCode r" id="cb55"><code class="sourceCode r"><div class="sourceLine" id="cb55-1" data-line-number="1">xgb_opts =<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">eta=</span><span class="kw">c</span>(.<span class="dv">3</span>,.<span class="dv">4</span>),</div>
+<div class="sourceLine" id="cb55-2" data-line-number="2">                       <span class="dt">max_depth=</span><span class="kw">c</span>(<span class="dv">9</span>, <span class="dv">12</span>),</div>
+<div class="sourceLine" id="cb55-3" data-line-number="3">                       <span class="dt">colsample_bytree=</span><span class="kw">c</span>(.<span class="dv">6</span>,.<span class="dv">8</span>),</div>
+<div class="sourceLine" id="cb55-4" data-line-number="4">                       <span class="dt">subsample=</span><span class="kw">c</span>(.<span class="dv">5</span>,.<span class="dv">75</span>,<span class="dv">1</span>),</div>
+<div class="sourceLine" id="cb55-5" data-line-number="5">                       <span class="dt">nrounds=</span><span class="dv">1000</span>,</div>
+<div class="sourceLine" id="cb55-6" data-line-number="6">                       <span class="dt">min_child_weight=</span><span class="dv">1</span>,</div>
+<div class="sourceLine" id="cb55-7" data-line-number="7">                       <span class="dt">gamma=</span><span class="dv">0</span>)</div></code></pre>
+<pre class="sourceCode r" id="cb56"><code class="sourceCode r"><div class="sourceLine" id="cb56-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">1234</span>)</div>
+<div class="sourceLine" id="cb56-2" data-line-number="2"><span class="co">#the R code form m-clark has the object called &#39;good&#39;. Be aware the variable name is different or not, and the technique are all the same</span></div>
+<div class="sourceLine" id="cb56-3" data-line-number="3">results_xgb =<span class="st"> </span><span class="kw">train</span>(quality<span class="op">~</span>.,  </div>
+<div class="sourceLine" id="cb56-4" data-line-number="4">                    <span class="dt">data=</span>wine_train, </div>
+<div class="sourceLine" id="cb56-5" data-line-number="5">                    <span class="dt">method=</span><span class="st">&#39;xgbTree&#39;</span>,</div>
+<div class="sourceLine" id="cb56-6" data-line-number="6">                    <span class="dt">preProcess=</span><span class="kw">c</span>(<span class="st">&#39;center&#39;</span>, <span class="st">&#39;scale&#39;</span>), </div>
+<div class="sourceLine" id="cb56-7" data-line-number="7">                    <span class="dt">trControl=</span>cv_opts, </div>
+<div class="sourceLine" id="cb56-8" data-line-number="8">                    <span class="dt">tuneGrid=</span>xgb_opts)</div>
+<div class="sourceLine" id="cb56-9" data-line-number="9">results_xgb</div>
+<div class="sourceLine" id="cb56-10" data-line-number="10">preds_gb =<span class="st"> </span><span class="kw">predict</span>(results_xgb, wine_test)</div>
+<div class="sourceLine" id="cb56-11" data-line-number="11"><span class="kw">confusionMatrix</span>(preds_gb, good_observed, <span class="dt">positive=</span><span class="st">&#39;Good&#39;</span>)</div></code></pre>
+</div>
+</div>
+<div id="stacking" class="section level3 unnumbered">
+<h3>Stacking</h3>
+<p><img src="Stacking.png" alt="Stacking" />
+在stacking裡面，重要的是那些單一預測模型之預測結果，都是最終meta-learner模型所需的訓練資料的來源。</p>
+<blockquote>
+<p>一般來說，若我們手上已經嘗試過多個單一預測模型，則我可以選擇像bagging一樣，將表現平均（voting），一般平均或者加權平均都沒問題。或者選擇stacking</p>
+</blockquote>
+<p>首先我利用不同的單一模型做訓練，並且將資料餵入並得到每一個模型下的y_i_hat，並且將這些y_i_hat，用為meta_learner model的資料來源。</p>
+<p>等到meta_learner選定好之後，並用原始資料以及y_i_hat的資料一起去訓練meta_learner模型。</p>
+<p>stacking的感覺其實有一點像NNet，把中間加了一層，但是不代表越多層準確度就越好。</p>
+
+</div>
+</div>
+
+
+
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="basic-on-unsupervised-learning.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="offical-tutorial.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

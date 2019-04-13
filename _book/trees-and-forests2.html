@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Chapter 7 Trees and Forests2 | A Minimal ML Example</title>
+  <meta name="description" content="This is a minimal example of using the bookdown package to build-up a ML reference book. The output format for this example is bookdown::gitbook.">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+
+  <meta property="og:title" content="Chapter 7 Trees and Forests2 | A Minimal ML Example" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="This is a minimal example of using the bookdown package to build-up a ML reference book. The output format for this example is bookdown::gitbook." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 7 Trees and Forests2 | A Minimal ML Example" />
+  
+  <meta name="twitter:description" content="This is a minimal example of using the bookdown package to build-up a ML reference book. The output format for this example is bookdown::gitbook." />
+  
+
+<meta name="author" content="M-Team">
+
+
+<meta name="date" content="2019-03-06">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="trees-and-forests.html">
+<link rel="next" href="svm.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceLine, a.sourceLine { display: inline-block; min-height: 1.25em; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; }
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+div.sourceLine, a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource div.sourceLine, .numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource div.sourceLine::before, .numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em; }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; color: #aaaaaa;  padding-left: 4px; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; color: initial; }
+}
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.bn { color: #40a070; } /* BaseN */
+code span.fl { color: #40a070; } /* Float */
+code span.ch { color: #4070a0; } /* Char */
+code span.st { color: #4070a0; } /* String */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.ot { color: #007020; } /* Other */
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.fu { color: #06287e; } /* Function */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code span.cn { color: #880000; } /* Constant */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.im { } /* Import */
+code span.va { color: #19177c; } /* Variable */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.op { color: #666666; } /* Operator */
+code span.bu { } /* BuiltIn */
+code span.ex { } /* Extension */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.at { color: #7d9029; } /* Attribute */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">A Minimal ML Example</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Basic tutorial</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#section-1.1"><i class="fa fa-check"></i><b>1.1</b> 新增章節方式</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#section-1.2"><i class="fa fa-check"></i><b>1.2</b> 環境設定</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#section-1.3"><i class="fa fa-check"></i><b>1.3</b> 資料集引入</a></li>
+</ul></li>
+<li class="part"><span><b>I Part I: Supervised-Learning</b></span></li>
+<li class="chapter" data-level="2" data-path="regularized-regression.html"><a href="regularized-regression.html"><i class="fa fa-check"></i><b>2</b> Regularized Regression</a><ul>
+<li class="chapter" data-level="" data-path="regularized-regression.html"><a href="regularized-regression.html#check-distribution-after-normalization"><i class="fa fa-check"></i>check distribution after normalization</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="k-nearest-neighbors.html"><a href="k-nearest-neighbors.html"><i class="fa fa-check"></i><b>3</b> k-nearest Neighbors</a></li>
+<li class="chapter" data-level="4" data-path="neutral-network.html"><a href="neutral-network.html"><i class="fa fa-check"></i><b>4</b> Neutral Network</a><ul>
+<li class="chapter" data-level="" data-path="neutral-network.html"><a href="neutral-network.html#e6a99fe599a8e5adb8e7bf92e6ada5e9a99f"><i class="fa fa-check"></i>機器學習步驟</a><ul>
+<li class="chapter" data-level="" data-path="neutral-network.html"><a href="neutral-network.html#e6b581e7a88be59c96"><i class="fa fa-check"></i>流程圖</a></li>
+<li class="chapter" data-level="" data-path="neutral-network.html"><a href="neutral-network.html#e58887e589b2e8b387e69699"><i class="fa fa-check"></i>切割資料</a></li>
+<li class="chapter" data-level="" data-path="neutral-network.html"><a href="neutral-network.html#how-the-model-is-evaluated"><i class="fa fa-check"></i>How the model is evaluated</a></li>
+<li class="chapter" data-level="" data-path="neutral-network.html"><a href="neutral-network.html#pre-processing-setup"><i class="fa fa-check"></i>Pre-processing setup</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="neutral-network2.html"><a href="neutral-network2.html"><i class="fa fa-check"></i><b>5</b> Neutral Network2</a><ul>
+<li class="chapter" data-level="" data-path="neutral-network2.html"><a href="neutral-network2.html#-1"><i class="fa fa-check"></i>機器學習步驟</a><ul>
+<li class="chapter" data-level="" data-path="neutral-network2.html"><a href="neutral-network2.html#-1"><i class="fa fa-check"></i>流程圖</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="neutral-network2.html"><a href="neutral-network2.html#nnet"><i class="fa fa-check"></i>類神經網絡(NNet)</a><ul>
+<li class="chapter" data-level="" data-path="neutral-network2.html"><a href="neutral-network2.html#how-the-model-is-evaluated-1"><i class="fa fa-check"></i>How the model is evaluated</a></li>
+<li class="chapter" data-level="" data-path="neutral-network2.html"><a href="neutral-network2.html#pre-processing-setup-1"><i class="fa fa-check"></i>Pre-processing setup</a></li>
+<li class="chapter" data-level="" data-path="neutral-network2.html"><a href="neutral-network2.html#tuning-parameter-set-setup"><i class="fa fa-check"></i>(Tuning) parameter set setup</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="trees-and-forests.html"><a href="trees-and-forests.html"><i class="fa fa-check"></i><b>6</b> Trees and Forests</a><ul>
+<li class="chapter" data-level="" data-path="trees-and-forests.html"><a href="trees-and-forests.html#e6a682e5bfb5"><i class="fa fa-check"></i>概念</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests.html"><a href="trees-and-forests.html#cross-validation-pre-processing"><i class="fa fa-check"></i>Cross-Validation &amp; Pre processing</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests.html"><a href="trees-and-forests.html#tuning-parameters"><i class="fa fa-check"></i>Tuning parameters</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests.html"><a href="trees-and-forests.html#e59084e588a5e8ae8ae695b8e79a84e9878de8a681e680a7"><i class="fa fa-check"></i>各別變數的重要性</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests.html"><a href="trees-and-forests.html#lime"><i class="fa fa-check"></i>LIME</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="trees-and-forests2.html"><a href="trees-and-forests2.html"><i class="fa fa-check"></i><b>7</b> Trees and Forests2</a><ul>
+<li class="chapter" data-level="" data-path="trees-and-forests2.html"><a href="trees-and-forests2.html#e99aa8e6a99fe6a3aee69e97"><i class="fa fa-check"></i>隨機森林</a><ul>
+<li class="chapter" data-level="" data-path="neutral-network2.html"><a href="neutral-network2.html#-1"><i class="fa fa-check"></i>概念</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests2.html"><a href="trees-and-forests2.html#cross-validation-pre-processing-1"><i class="fa fa-check"></i>Cross-Validation &amp; Pre processing</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests2.html"><a href="trees-and-forests2.html#tuning-parameters-1"><i class="fa fa-check"></i>Tuning parameters</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests2.html"><a href="trees-and-forests2.html#make-confusionm-matrix"><i class="fa fa-check"></i>make confusionm matrix</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests2.html"><a href="trees-and-forests2.html#e8ae8ae695b8e9878de8a681e680a7e8a1a1e9878f"><i class="fa fa-check"></i>變數重要性衡量</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests2.html"><a href="trees-and-forests2.html#e8a780e5af9fe585a9e585a9e8ae8ae695b8e4b98be9979ce4bf82"><i class="fa fa-check"></i>觀察兩兩變數之關係</a></li>
+<li class="chapter" data-level="" data-path="trees-and-forests2.html"><a href="trees-and-forests2.html#lime-1"><i class="fa fa-check"></i>LIME</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="svm.html"><a href="svm.html"><i class="fa fa-check"></i><b>8</b> SVM</a><ul>
+<li class="chapter" data-level="" data-path="svm.html"><a href="svm.html#-2"><i class="fa fa-check"></i>概念</a><ul>
+<li class="chapter" data-level="" data-path="svm.html"><a href="svm.html#the-non-separable-case"><i class="fa fa-check"></i>The Non-Separable case</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="svm.html"><a href="svm.html#r-code-example"><i class="fa fa-check"></i>R-code example</a><ul>
+<li class="chapter" data-level="" data-path="svm.html"><a href="svm.html#cross-validation-pre-processing-2"><i class="fa fa-check"></i>Cross-Validation &amp; Pre processing</a></li>
+<li class="chapter" data-level="" data-path="svm.html"><a href="svm.html#tuning-parameters-2"><i class="fa fa-check"></i>Tuning parameters</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>II Part II: Unsupervised-Learning</b></span></li>
+<li class="chapter" data-level="9" data-path="basic-on-unsupervised-learning.html"><a href="basic-on-unsupervised-learning.html"><i class="fa fa-check"></i><b>9</b> Basic on Unsupervised-Learning</a><ul>
+<li class="chapter" data-level="" data-path="basic-on-unsupervised-learning.html"><a href="basic-on-unsupervised-learning.html#cluster"><i class="fa fa-check"></i>Cluster</a><ul>
+<li class="chapter" data-level="" data-path="basic-on-unsupervised-learning.html"><a href="basic-on-unsupervised-learning.html#k-"><i class="fa fa-check"></i>K-平均演算法</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="basic-on-unsupervised-learning.html"><a href="basic-on-unsupervised-learning.html#latent-variable-models"><i class="fa fa-check"></i>Latent Variable Models</a><ul>
+<li class="chapter" data-level="" data-path="basic-on-unsupervised-learning.html"><a href="basic-on-unsupervised-learning.html#e5b8b8e8a68be79a84e58886e69e90e6898be6b395"><i class="fa fa-check"></i>常見的分析手法</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="basic-on-unsupervised-learning.html"><a href="basic-on-unsupervised-learning.html#graphical-structure"><i class="fa fa-check"></i>Graphical Structure</a></li>
+<li class="chapter" data-level="" data-path="basic-on-unsupervised-learning.html"><a href="basic-on-unsupervised-learning.html#imputation"><i class="fa fa-check"></i>Imputation</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="ensembles.html"><a href="ensembles.html"><i class="fa fa-check"></i><b>10</b> Ensembles</a><ul>
+<li class="chapter" data-level="" data-path="ensembles.html"><a href="ensembles.html#bagging"><i class="fa fa-check"></i>Bagging</a></li>
+<li class="chapter" data-level="" data-path="ensembles.html"><a href="ensembles.html#boosting"><i class="fa fa-check"></i>Boosting</a></li>
+<li class="chapter" data-level="" data-path="ensembles.html"><a href="ensembles.html#stacking"><i class="fa fa-check"></i>Stacking</a></li>
+</ul></li>
+<li class="appendix"><span><b>Appendix</b></span></li>
+<li class="chapter" data-level="A" data-path="offical-tutorial.html"><a href="offical-tutorial.html"><i class="fa fa-check"></i><b>A</b> Offical tutorial</a></li>
+<li class="chapter" data-level="B" data-path="the-dataset.html"><a href="the-dataset.html"><i class="fa fa-check"></i><b>B</b> The Dataset</a></li>
+<li class="chapter" data-level="C" data-path="python-on-rstudio.html"><a href="python-on-rstudio.html"><i class="fa fa-check"></i><b>C</b> Python on RStudio</a></li>
+<li class="chapter" data-level="D" data-path="ml-vv.html"><a href="ml-vv.html"><i class="fa fa-check"></i><b>D</b> ML_VV</a></li>
+<li class="divider"></li>
+<li><a href="https://sites.google.com/view/ntpu-mteam" target="blank">M-Team</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">A Minimal ML Example</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="trees-and-forests2" class="section level1">
+<h1><span class="header-section-number">Chapter 7</span> Trees and Forests2</h1>
+<div id="e99aa8e6a99fe6a3aee69e97" class="section level2 unnumbered">
+<h2>隨機森林</h2>
+<p>參考資料：<a href="https://topepo.github.io/caret/train-models-by-tag.html#Random_Forest" class="uri">https://topepo.github.io/caret/train-models-by-tag.html#Random_Forest</a></p>
+<div id="-1" class="section level3 unnumbered">
+<h3>概念</h3>
+<div id="decision-tree-classifier-1" class="section level4 unnumbered">
+<h4>Decision tree classifier</h4>
+<p><a href="https://medium.com/machine-learning-101/chapter-3-decision-trees-theory-e7398adac567">Basic concept</a>: 非常清楚的說明</p>
+<p><a href="https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier">scikit code documentation</a></p>
+</div>
+<div id="random-forest-classifier-1" class="section level4 unnumbered">
+<h4>Random forest classifier</h4>
+<p>給定一組training data，演算法會決定那一棵樹最適合它(?)。Random forest透過Boostrapping產生如1000個training data，每個用來找一棵最適合它的樹，最後以這1000顆樹來衡量它對真正test data的預測（採多數決）。</p>
+</div>
+</div>
+<div id="cross-validation-pre-processing-1" class="section level3 unnumbered">
+<h3>Cross-Validation &amp; Pre processing</h3>
+<p>同前</p>
+</div>
+<div id="tuning-parameters-1" class="section level3 unnumbered">
+<h3>Tuning parameters</h3>
+<p>mtry: 隨機選出來用來架構樹之節點的特徵變數個數</p>
+<blockquote>
+<p>In addition, when splitting a node during the construction of the tree, the split that is chosen (即用什麼特徵變數來進一步分類) is no longer the best split among all features. Instead, the split that is picked is the best split among a random subset of the features. …<a href="https://scikit-learn.org/stable/modules/ensemble.html#forest">scikit code documentation</a></p>
+</blockquote>
+<p>ntree: 透過Boostrapping來產生「找樹用的」training data(一組樣本找一顆)。</p>
+<pre class="sourceCode r" id="cb42"><code class="sourceCode r"><div class="sourceLine" id="cb42-1" data-line-number="1">rf_opts =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">mtry=</span><span class="kw">c</span>(<span class="dv">2</span><span class="op">:</span><span class="dv">6</span>))</div>
+<div class="sourceLine" id="cb42-2" data-line-number="2">results_rf =<span class="st"> </span><span class="kw">train</span>(quality<span class="op">~</span>., </div>
+<div class="sourceLine" id="cb42-3" data-line-number="3">                   <span class="dt">data =</span> wine_train,</div>
+<div class="sourceLine" id="cb42-4" data-line-number="4">                   <span class="dt">method =</span> <span class="st">&#39;rf&#39;</span>,</div>
+<div class="sourceLine" id="cb42-5" data-line-number="5">                   <span class="dt">preProcess =</span> <span class="kw">c</span>(<span class="st">&#39;center&#39;</span>, <span class="st">&#39;scale&#39;</span>),</div>
+<div class="sourceLine" id="cb42-6" data-line-number="6">                   <span class="dt">trControl =</span> cv_opts,</div>
+<div class="sourceLine" id="cb42-7" data-line-number="7">                   <span class="dt">tuneGrid =</span> rf_opts,</div>
+<div class="sourceLine" id="cb42-8" data-line-number="8">                   <span class="dt">localImp =</span> T,</div>
+<div class="sourceLine" id="cb42-9" data-line-number="9">                   <span class="dt">ntree=</span><span class="dv">10</span>)</div>
+<div class="sourceLine" id="cb42-10" data-line-number="10">results_rf</div></code></pre>
+</div>
+<div id="make-confusionm-matrix" class="section level3 unnumbered">
+<h3>make confusionm matrix</h3>
+<p>參考資料：<a href="https://hyp.is/f2kmRgEUEemKAFeGta_7RA/m-clark.github.io/introduction-to-machine-learning/opening-the-black-box.html" class="uri">https://hyp.is/f2kmRgEUEemKAFeGta_7RA/m-clark.github.io/introduction-to-machine-learning/opening-the-black-box.html</a></p>
+<pre class="sourceCode r" id="cb43"><code class="sourceCode r"><div class="sourceLine" id="cb43-1" data-line-number="1">preds_rf =<span class="st"> </span><span class="kw">predict</span>(results_rf, wine_test)</div>
+<div class="sourceLine" id="cb43-2" data-line-number="2">preds_rf</div>
+<div class="sourceLine" id="cb43-3" data-line-number="3"><span class="kw">confusionMatrix</span>(preds_rf, good_observed, <span class="dt">positive=</span><span class="st">&#39;good&#39;</span>)</div></code></pre>
+<p>利用confusionMatrix觀察模型衡量指標（準確率、召回率．．．）並依照研究問題判斷模型適不適合。</p>
+</div>
+<div id="e8ae8ae695b8e9878de8a681e680a7e8a1a1e9878f" class="section level3 unnumbered">
+<h3>變數重要性衡量</h3>
+<p><strong>參考資料</strong>: <a href="https://cran.rstudio.com/web/packages/randomForestExplainer/vignettes/randomForestExplainer.html" class="uri">https://cran.rstudio.com/web/packages/randomForestExplainer/vignettes/randomForestExplainer.html</a></p>
+<div id="vimp" class="section level4 unnumbered">
+<h4>VIMP</h4>
+<p>概念：利用特徵經過置換前與置換後的誤差影響，來衡量該特徵的重要性。</p>
+<p>步驟：</p>
+<ol style="list-style-type: decimal">
+<li>利用每棵樹的分類模型來預測自己的OOB樣本，並計算錯誤率。</li>
+</ol>
+<ul>
+<li>OOB：在建構每棵樹的時候，我們對訓練集使用了不同的bootstrap sample。所以對於每棵樹而言，大约有1/3的資料點是沒有參與該棵樹的生成，他們就是該棵樹的OOB样本。</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li><p>對想了解該特徵重要性的特徵進行隨機打亂，例如：把各資料點的「酒精濃度」進行隨機打亂。</p></li>
+<li><p>利用原隨機森林模型進行預測得到新的outcome。</p></li>
+<li><p>計算每棵樹新的OOB樣本錯誤率。</p></li>
+<li><p>對於每棵樹擾亂特徵前後所得到的錯誤率相減並平均。</p></li>
+<li><p>得出因該特徵擾亂後而導致的平均誤差上升多少，越高代表該變數越重要。</p></li>
+</ol>
+<pre class="sourceCode r" id="cb44"><code class="sourceCode r"><div class="sourceLine" id="cb44-1" data-line-number="1"><span class="kw">varImp</span>(results_rf)</div></code></pre>
+</div>
+<div id="minimal-depth" class="section level4 unnumbered">
+<h4>Minimal depth</h4>
+<p>概念：每棵樹在生成每個節點時都會有一個特徵，在樹越上層（越淺）的特徵重要程度會越大，利用此特點來計算特徵的平均最小深度觀察特徵的重要性。</p>
+<p>補充：假設森林有兩棵樹，A樹中特徵「酒精濃度」出現在第一層，B樹中「酒精濃度」出現在第二層與第四層，那麼平均最小深度為(<span class="math inline">\(\frac{7}{3}\)</span>)</p>
+<pre class="sourceCode r" id="cb45"><code class="sourceCode r"><div class="sourceLine" id="cb45-1" data-line-number="1"><span class="kw">library</span>(randomForestExplainer)</div>
+<div class="sourceLine" id="cb45-2" data-line-number="2"><span class="kw">plot_min_depth_distribution</span>(results_rf<span class="op">$</span>finalModel)</div>
+<div class="sourceLine" id="cb45-3" data-line-number="3"><span class="kw">plot_min_depth_interactions</span>(results_rf<span class="op">$</span>finalModel, <span class="dt">k=</span><span class="dv">7</span>)</div></code></pre>
+</div>
+<div id="other-measures" class="section level4 unnumbered">
+<h4>Other Measures</h4>
+<p>參考資料：<a href="https://cran.r-project.org/web/packages/randomForestExplainer/vignettes/randomForestExplainer.html" class="uri">https://cran.r-project.org/web/packages/randomForestExplainer/vignettes/randomForestExplainer.html</a></p>
+<pre class="sourceCode r" id="cb46"><code class="sourceCode r"><div class="sourceLine" id="cb46-1" data-line-number="1">multi_imps =<span class="st"> </span><span class="kw">measure_importance</span>(results_rf<span class="op">$</span>finalModel)</div>
+<div class="sourceLine" id="cb46-2" data-line-number="2"><span class="kw">plot_importance_ggpairs</span>(multi_imps)</div></code></pre>
+</div>
+</div>
+<div id="e8a780e5af9fe585a9e585a9e8ae8ae695b8e4b98be9979ce4bf82" class="section level3 unnumbered">
+<h3>觀察兩兩變數之關係</h3>
+<p>參考資料：ggRandomForests <a href="https://arxiv.org/pdf/1501.07196" class="uri">https://arxiv.org/pdf/1501.07196</a></p>
+<pre class="sourceCode r" id="cb47"><code class="sourceCode r"><div class="sourceLine" id="cb47-1" data-line-number="1"><span class="co"># tibble causes problem so convert wine_train to standard df.</span></div>
+<div class="sourceLine" id="cb47-2" data-line-number="2"><span class="kw">library</span>(ggRandomForests)</div>
+<div class="sourceLine" id="cb47-3" data-line-number="3">rf2 =<span class="st"> </span><span class="kw">rfsrc</span>(<span class="dt">formula =</span> quality <span class="op">~</span>., </div>
+<div class="sourceLine" id="cb47-4" data-line-number="4">            <span class="dt">data =</span> <span class="kw">data.frame</span>(wine_train),</div>
+<div class="sourceLine" id="cb47-5" data-line-number="5">            <span class="dt">mtry =</span> results_rf<span class="op">$</span>finalModel<span class="op">$</span>mtry)</div>
+<div class="sourceLine" id="cb47-6" data-line-number="6">gg_v =<span class="st"> </span><span class="kw">gg_variable</span>(rf2)</div>
+<div class="sourceLine" id="cb47-7" data-line-number="7">gg_md =<span class="st"> </span><span class="kw">gg_minimal_depth</span>(rf2)</div>
+<div class="sourceLine" id="cb47-8" data-line-number="8">gg_v</div>
+<div class="sourceLine" id="cb47-9" data-line-number="9">gg_md</div>
+<div class="sourceLine" id="cb47-10" data-line-number="10">xvar =<span class="st"> </span>gg_md<span class="op">$</span>topvars[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]<span class="co">#表示取出前兩個最重要的變數。</span></div>
+<div class="sourceLine" id="cb47-11" data-line-number="11"><span class="kw">plot</span>(gg_v, <span class="dt">xvar=</span>xvar, <span class="dt">panel=</span><span class="ot">TRUE</span>, <span class="dt">partial=</span><span class="ot">TRUE</span>, <span class="dt">alpha=</span>.<span class="dv">1</span>)</div></code></pre>
+<p>圖中縱軸為模型判定為good的機率，每一個點代表一個資料點，顏色為該資料點的真實outcome，以點(10,0.75,紅)為例；表示有一瓶酒，其酒精濃度為10且1000棵樹裡面有750棵說他是good(0.75)，但它實際上是壞的（紅色）。</p>
+</div>
+<div id="lime-1" class="section level3 unnumbered">
+<h3>LIME</h3>
+<p>LIME 想要解決的問題：找到一個容易解釋的模型 g 解釋為什麼一個個體會被分類到f預測的類別；f是依據什麼特徵來分類進一步了解各特徵的重要性。</p>
+<p>參考資料： <a href="https://medium.com/@kstseng/lime-local-interpretable-model-agnostic-explanation-%E6%8A%80%E8%A1%93%E4%BB%8B%E7%B4%B9-a67b6c34c3f8">https://medium.com/@kstseng/lime-local-interpretable-model-agnostic-explanation-%E6%8A%80%E8%A1%93%E4%BB%8B%E7%B4%B9-a67b6c34c3f8</a></p>
+<p>步驟：</p>
+<p>每一瓶酒</p>
+<ol style="list-style-type: decimal">
+<li>Permute the data n times to create data with similar distributional properties to the original.</li>
+</ol>
+<ul>
+<li><p>創造相似的酒（特徵變化要符合原始資料特徴間的統計性質，如變異及相關程度）。</p>
+<p>擾動樣本：進行有意義的擾動（改變<span class="math inline">\({x}_i\)</span>的幾個特徵值），產生新的輸入資料<span class="math inline">\({z}_i\)</span>。</p></li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>Get similarity scores of the permuted observations to the observations you wish to explain.</li>
+</ol>
+<ul>
+<li>依相似度要計算與原本那瓶酒的 「相似度」；與原資料的距離越近者給予的係數 <span class="math inline">\(\pi_{{x}_i}\)</span> 越大，之後權重用。</li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>Make predictions with the permuted data based on the ML model.</li>
+</ol>
+<ul>
+<li>對新樣本(<span class="math inline">\({z}_i\)</span>)做ML分類得到新樣本得預測結果g(z)。</li>
+</ul>
+<ol start="4" style="list-style-type: decimal">
+<li>Min loss function : <span class="math inline">\(\sum\pi_{{x}_i}(f(z)-g(z))^2+ \Omega(g)\)</span></li>
+</ol>
+<ul>
+<li>f(z)為真實outcome，<span class="math inline">\(\Omega(g)\)</span>為懲罰項目的為希望g能簡單一點，<span class="math inline">\(\pi_{{x}_i}\)</span>為「與<span class="math inline">\({x}_i\)</span>相似與否」的核函數。極小化loss function 找出最適的g。</li>
+</ul>
+<ol start="4" style="list-style-type: decimal">
+<li>Select m features (e.g. forward selection, lasso) best describing the complex model outcome from the permuted data.</li>
+</ol>
+<ul>
+<li>選擇一組你想理解對ML結果影響重要的特徵。</li>
+</ul>
+<ol start="5" style="list-style-type: decimal">
+<li>Fit a simple model, e.g. standard regression, predicting the predictions from the ML model with the m features, where observations are weighted by similarity to the to-be-explained observations.</li>
+</ol>
+<ul>
+<li>對摸擬樣本<span class="math inline">\({z}_i\)</span>與選好的幾個特徵進行加權迴歸(model g)，觀察各特徵係數值；係數值越大者越重要。</li>
+</ul>
+<p>因為LIME很吃電腦資源所以下例程式碼中只隨機挑選了5個case（5個資料點）進行LIME</p>
+<pre class="sourceCode r" id="cb48"><code class="sourceCode r"><div class="sourceLine" id="cb48-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">1234</span>)</div>
+<div class="sourceLine" id="cb48-2" data-line-number="2">sample_index =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(wine_test), <span class="dv">5</span>)<span class="co">#隨機選取幾個case</span></div>
+<div class="sourceLine" id="cb48-3" data-line-number="3">sample_test =<span class="st"> </span>wine_test <span class="op">%&gt;%</span><span class="st"> </span></div>
+<div class="sourceLine" id="cb48-4" data-line-number="4"><span class="st">  </span><span class="kw">slice</span>(sample_index) <span class="op">%&gt;%</span><span class="st"> </span></div>
+<div class="sourceLine" id="cb48-5" data-line-number="5"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>quality) <span class="co">#分別拿掉5個case的outcome</span></div>
+<div class="sourceLine" id="cb48-6" data-line-number="6"><span class="kw">library</span>(lime)</div>
+<div class="sourceLine" id="cb48-7" data-line-number="7">rf_lime =<span class="st"> </span><span class="kw">lime</span>(wine_train, results_rf)<span class="co">#lime</span></div>
+<div class="sourceLine" id="cb48-8" data-line-number="8">rf_explain =<span class="st"> </span><span class="kw">explain</span>(sample_test, </div>
+<div class="sourceLine" id="cb48-9" data-line-number="9">                     rf_lime, </div>
+<div class="sourceLine" id="cb48-10" data-line-number="10">                     <span class="dt">n_features =</span> <span class="dv">3</span>,<span class="co">#只看三種特徵的組合</span></div>
+<div class="sourceLine" id="cb48-11" data-line-number="11">                     <span class="dt">feature_select =</span> <span class="st">&#39;highest_weights&#39;</span>,</div>
+<div class="sourceLine" id="cb48-12" data-line-number="12">                     <span class="dt">labels =</span> <span class="st">&#39;good&#39;</span>)</div>
+<div class="sourceLine" id="cb48-13" data-line-number="13">rf_explain<span class="co">#各case跑完lime的係數狀況</span></div>
+<div class="sourceLine" id="cb48-14" data-line-number="14"><span class="kw">plot_features</span>(rf_explain)</div>
+<div class="sourceLine" id="cb48-15" data-line-number="15"><span class="kw">plot_explanations</span>(rf_explain)</div></code></pre>
+<p>以case 1 為例：</p>
+<ul>
+<li>Probablity為預測good的機率</li>
+<li>feature_weight為-0.15表示當「0.40 &lt; volatile.acidity」時，每增加一單位酸度y便會造成減少0.16。</li>
+<li><span class="math display">\[y = \left\{\begin{array}{ll}
+             bad, &amp; \mbox{if $y&lt;0$} \\  
+             good, &amp; \mbox{if $y&gt;0$} \\  
+            \end{array} \right.\]</span></li>
+<li>Explanation為<span class="math inline">\(R^2\)</span></li>
+</ul>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="trees-and-forests.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="svm.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
