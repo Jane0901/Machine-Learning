@@ -8,7 +8,7 @@ output: html_document
 
 ```{r}
 library(reticulate)
-use_python("/Users/jane/anaconda3/envs/m-team-machine-learning/bin/python",
+use_python("~/anaconda3/envs/m-team-machine-learning/bin/python",
            required = T)
 use_condaenv("m-team-machine-learning")
 ```
