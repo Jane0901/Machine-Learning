@@ -11,8 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(reticulate)
-use_python("/Users/chenpoming/anaconda3/envs/m-team2/bin/python", required = T)
-use_condaenv("m-team2")
+use_python("/Users/chenpoming/anaconda3/envs/m-team-machine-learning/bin/python", required = T)
+use_condaenv("m-team-machine-learning")
 ```
 
 在R chunk內叫出Python code，用`py$`。反過來在python chunk叫出R code，用`r.`
@@ -446,8 +446,6 @@ from keras.datasets import boston_housing
 train_data.shape
 test_data.shape
 train_targets
-
-
 ```
 
 #### Preparing the data

@@ -130,5 +130,9 @@ Feature engineering is the process of using your own knowledge about the data an
 
 That’s the essence of feature engineering: making a problem easier by expressingit in a simpler way. It usually requires understanding the problem in depth.
 
+> validation set是用來決定模型結構的。那training set，是用來決定模型 $\beta$ 的參數值。但是validation則是用來決定整個最終的模型結構要有幾個feature（X變數）放到迴歸式中。
+
+> 關於validation set，確實只有如此嗎？有沒有一個實際的例子。
+
 
 
