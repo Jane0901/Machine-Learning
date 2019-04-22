@@ -348,7 +348,7 @@ conda_install(envname="m-team-machine-learning",
               pip=TRUE)
 ```
 
-# CH3 {-}
+# CH3{-}
 
 ```{python}
 from keras import models
@@ -372,15 +372,15 @@ loss='mse',
 metrics=['accuracy'])
 ```
 
-# 3.4 二元分類範例（Classifying movie reviews:a binary classification example）
+# 3.4 二元分類範例（Classifying movie reviews:a binary classification example）{-}
 
 根據電影評論的文字內容，分類正面或負面的評論。
 
-## 引入資料（The IMDB dataset）
+## 引入資料（The IMDB dataset）{-}
 
 來自電影評論網站的50,000個評論。
 
-### Loading the IMDB dataset
+### Loading the IMDB dataset{-}
 
 ```{python}
 from keras.datasets import imdb
@@ -394,7 +394,7 @@ print(train_data[0])
 ```
 
 ```{r}
-ps$train_data -> train_data
+py$train_data->train_data
 py$train_labels->train_labels # 1 正評； 0 負評
 ```
 
@@ -418,11 +418,7 @@ decoded_review = ' '.join(
 # the indices are offset by 3 because 0, 1, and 2 are reserved indices for “padding,” “start of sequence,” and “unknown.”
 ```
 
-<https://www.w3schools.com/python/ref_dictionary_get.asp>
-
-```{python}
-help("reverse_word_index.get()")
-```
+[Python Dictionary get() Method](https://www.w3schools.com/python/ref_dictionary_get.asp)
 
 ```{r}
 library(dplyr)
@@ -430,9 +426,9 @@ py$word_index %>% View
 py$reverse_word_index
 ```
 
-## 處理資料（Preparing the data）
+## 處理資料（Preparing the data）{-}
 
-### Encoding the integer sequences into a binary matrix
+### Encoding the integer sequences into a binary matrix{-}
 
 Turn the lists into tensors:
 
@@ -461,9 +457,9 @@ y_test = np.asarray(test_labels).astype('float32')
 print(x_train[0])
 ```
 
-## 建神經網絡（Building your network）
+## 建神經網絡（Building your network）{-}
 
-### The model definition
+### The model definition{-}
  
 - How many layers to use?
 
@@ -488,7 +484,7 @@ NOTE:激活函數（activation functions）負責爲神經網絡引入非線性�
 
 [relu activation function](https://medium.com/tinymind/a-practical-guide-to-relu-b83ca804f1f7)
 
-### Compiling the model
+### Compiling the model{-}
 
 - loss funtion:也可選擇mean_squared_error，但在二元分類中，binary_crossentropy是較好的選擇。
 
@@ -500,7 +496,7 @@ loss='binary_crossentropy',
 metrics=['accuracy'])
 ```
 
-### Configuring the optimizer
+### Configuring the optimizer{-}
 
 自行選擇optimizer的方式
 
@@ -511,7 +507,7 @@ loss='binary_crossentropy',
 metrics=['accuracy'])
 ```
 
-### Using custom losses and metrics
+### Using custom losses and metrics{-}
 
 自行選擇metrics的方式
 
@@ -528,9 +524,9 @@ metrics=[metrics.binary_accuracy])
 py$metrics %>% {.$binary_accuracy}
 ```
 
-## 驗證（Validating your approach）
+## 驗證（Validating your approach）{-}
 
-### Setting aside a validation set
+### Setting aside a validation set{-}
 
 ```{python}
 x_val = x_train[:10000]
@@ -548,7 +544,7 @@ x_val[1,]
 ```
 
 
-### Training your model
+### Training your model{-}
 
 ```{python}
 model.compile(optimizer='rmsprop',
@@ -570,7 +566,7 @@ history_dict = history.history
 print(history_dict.keys())
 ```
 
-### Plotting the training and validation loss
+### Plotting the training and validation loss{-}
 
 ```{r, eval=FALSE}
 conda_install("m-team-machine-learning",
@@ -600,7 +596,7 @@ plt.legend()
 plt.show()
 ```
 
-### Plotting the training and validation accuracy
+### Plotting the training and validation accuracy{-}
 
 ```{python}
 plt.clf() # Clears the figure
@@ -618,7 +614,7 @@ plt.legend()
 plt.show()
 ```
 
-### Retraining a model from scratch
+### Retraining a model from scratch{-}
 
 ```{python}
 model = models.Sequential()
@@ -643,13 +639,13 @@ print(results)
 ```
 
 
-## 預測（Using a trained network to generate predictions on new data）
+## 預測（Using a trained network to generate predictions on new data）{-}
 
 ```{python}
 print(model.predict(x_test))
 ```
 
-## 可調參數 （Further experiments）
+## 可調參數 （Further experiments）{-}
 
 - Try using one or three hidden layers, and see how doing so affects validation and test accuracy.
 
@@ -659,13 +655,15 @@ print(model.predict(x_test))
 
 - Try using the `tanh` activation (an activation that was popular in the early days of neural networks) instead of `relu`.
 
-# 3.5 多元分類範例（Classifying newswires:a multiclass classification example）
+# 3.5 多元分類範例（Classifying newswires:a multiclass classification example）{-}
 
 根據路透社在1986年出版的一些新聞，分類為46個主題。
 
-## 引入資料（The Reuters dataset）
+## 引入資料（The Reuters dataset）{-}
 
-###  Loading the Reuters dataset
+8,982個訓練集和2,246個測試集。
+
+###  Loading the Reuters dataset{-}
 
 ```{python}
 from keras.datasets import reuters
@@ -700,9 +698,9 @@ decoded_newswire = ' '.join([reverse_word_index.get(i - 3, '?') for i in
 print(train_labels[10])
 ```
 
-## 處理資料（Preparing the data）
+## 處理資料（Preparing the data）{-}
 
-### Encoding the data
+### Encoding the data{-}
 
 ```{python}
 import numpy as np
@@ -715,7 +713,7 @@ x_train = vectorize_sequences(train_data)
 x_test = vectorize_sequences(test_data)
 ```
 
-### One-hot encoding
+### One-hot encoding{-}
 
 獨熱編碼，又稱一位有效編碼，其方法是使用N位狀態暫存器來對N個狀態進行編碼，每個狀態都有它獨立的暫存器位，並且在任意時候，其中只有一位有效。
 
@@ -744,9 +742,9 @@ one_hot_test_labels %>% dim
 one_hot_test_labels %>% head
 ```
 
-## 建神經網絡（Building your network）
+## 建神經網絡（Building your network{-}
 
-### Model definition
+### Model definition{-}
 
 - You end the network with a `Dense` layer of size 46. This means for each input sample, the network will output a 46-dimensional vector. Each entry in this vector (each dimension) will encode a different output class.
 
@@ -761,7 +759,7 @@ model.add(layers.Dense(64, activation='relu'))
 model.add(layers.Dense(46, activation='softmax')) # softmax:the network will output a probability distribution over the 46 different output classes
 ```
 
-### Compiling the model
+### Compiling the model{-}
 
 ```{python}
 model.compile(optimizer='rmsprop',
@@ -769,9 +767,9 @@ loss='categorical_crossentropy',
 metrics=['accuracy'])
 ```
 
-## 驗證
+## 驗證（Validating your approach）{-}
 
-### Setting aside a validation set
+### Setting aside a validation set{-}
 
 ```{python}
 x_val = x_train[:1000]
@@ -780,7 +778,7 @@ y_val = one_hot_train_labels[:1000]
 partial_y_train = one_hot_train_labels[1000:]
 ```
 
-### Training the model
+### Training the model{-}
 
 ```{python}
 history = model.fit(partial_x_train,
@@ -790,7 +788,7 @@ history = model.fit(partial_x_train,
                     validation_data=(x_val, y_val))
 ```
 
-### Plotting the training and validation loss
+### Plotting the training and validation loss{-}
 
 ```{python}
 import matplotlib.pyplot as plt
@@ -806,7 +804,7 @@ plt.legend()
 plt.show()
 ```
 
-### Plotting the training and validation accuracy
+### Plotting the training and validation accuracy{-}
 
 ```{python}
 plt.clf()
@@ -821,7 +819,7 @@ plt.legend()
 plt.show()
 ```
 
-### Retraining a model from scratch
+### Retraining a model from scratch{-}
 
 ```{python}
 model = models.Sequential()
@@ -851,7 +849,7 @@ hits_array = np.array(test_labels) == np.array(test_labels_copy)
 print(float(np.sum(hits_array)) / len(test_labels))
 ```
 
-## 預測（Using a trained network to generate predictions on new data）
+## 預測（Using a trained network to generate predictions on new data）{-}
 
 ```{python}
 predictions = model.predict(x_test)
@@ -860,6 +858,14 @@ predictions = model.predict(x_test)
 ```{python}
 # Each entry in predictions is a vector of length 46
 print(predictions[0].shape)
+```
+
+```{r}
+py$predictions %>% class
+py$predictions -> predictions
+predictions[1,] %>%
+  {which(.==max(.))}
+predictions[1,] %>% View
 ```
 
 ```{python}
@@ -873,22 +879,30 @@ print(np.argmax(predictions[0]))
 ```
 從0開始數，所以3代表第四類
 
-## 可調參數 （Further experiments）
+## 可調參數 （Further experiments）{-}
 
 - Try using larger or smaller layers: 32 units, 128 units, and so on.
 
 - Try using a single hidden layer, or three hidden layers.
 
-## 其他課題
+## 其他課題{-}
 
-### A different way to handle the labels and the loss
+### A different way to handle the labels and the loss{-}
 
 ```{python}
 y_train = np.array(train_labels)
 y_test = np.array(test_labels)
 ```
 
-The only thing this approach would change is the choice of the loss function.
+```{r}
+py$y_train %>% class
+py$y_train -> y_train
+y_train %>% head
+```
+
+<https://jovianlin.io/cat-crossentropy-vs-sparse-cat-crossentropy/>
+
+The only thing this approach would change is the choice of the loss function. So use sparse_categorical_crossentropy to deal with regular tensor labels.
 
 ```{python}
 model.compile(optimizer='rmsprop',
@@ -896,7 +910,7 @@ loss='sparse_categorical_crossentropy',
 metrics=['acc'])
 ```
 
-### The importance of having sufficiently large intermediate layers
+### The importance of having sufficiently large intermediate layers{-}
 
 drop掉太多內容，會導致準確率下降
 
@@ -915,11 +929,361 @@ batch_size=128,
 validation_data=(x_val, y_val))
 ```
 
-# 3.6 迴歸範例（Predicting house prices: a regression example）
+# 3.6 迴歸範例（Predicting house prices: a regression example）{-}
 
-## 引入資料（The Boston Housing Price dataset）
+根據1970年代中期波士頓郊區的相關數據，例如犯罪率、財產稅率等，預測房屋的價格中位數。
 
-###  Loading the Boston housing dataset
+## 引入資料（The Boston Housing Price dataset）{-}
+
+共506個資料點，分成404個訓練集和102個測試集。
+
+###  Loading the Boston housing dataset{-}
+
+```{python}
+from keras.datasets import boston_housing
+(train_data, train_targets), (test_data, test_targets) = boston_housing.load_data()
+```
+
+```{python}
+print(train_data.shape)
+print(test_data.shape)
+```
+
+```{python}
+print(train_targets)
+```
+
+價格落在10,000到50,000之間，因為時間是1970年代中期，且沒調整過通膨，所以才如此便宜。
+
+```{r}
+py$train_data->train_data
+py$train_targets->train_targets
+```
+
+共13個變數，其中的變數有人均犯罪率（per capita crime rate）、每棟住宅的平均房間數量（average number of rooms per dwelling）、高速公路的易達性（accessibility to highways）......
+
+## 處理資料（Preparing the data）{-}
+
+###  Normalizing the data{-}
+
+```{python}
+mean = train_data.mean(axis=0)
+train_data -= mean # train_data = train_data - mean
+std = train_data.std(axis=0)
+train_data /= std # train_data = train_data / std 
+test_data -= mean
+test_data /= std
+```
+
+要用訓練集標準化，不能用測試集標準化。
+
+## 建神經網絡（Building your network）{-}
+
+### Model definition{-}
+
+```{python}
+from keras import models
+from keras import layers
+
+def build_model():
+  model = models.Sequential()
+  model.add(layers.Dense(64, activation='relu',
+                          input_shape=(train_data.shape[1],)))
+  model.add(layers.Dense(64, activation='relu'))
+  model.add(layers.Dense(1)) # no activation
+  model.compile(optimizer='rmsprop', loss='mse', metrics=['mae']) # mean absolute error (MAE). It’s the absolute value of the difference between the predictions and the targets
+  return model
+```
+
+## 驗證（Validating your approach）{-}
+
+### K-fold validation {-}
+
+使用K-fold validation，避免資料分成訓練集跟驗證集時，驗證集的資料點過少。
+
+```{python}
+import numpy as np
+k=4
+num_val_samples = len(train_data) // k # //:取整除
+num_epochs = 100
+all_scores = []
+
+for i in range(k):
+  print('processing fold #', i)
+  val_data = train_data[i * num_val_samples: (i + 1) * num_val_samples] # Prepares the validation data:data from partition #k
+  val_targets = train_targets[i * num_val_samples: (i + 1) * num_val_samples]
+
+  partial_train_data = np.concatenate( # Prepares the training data:data from all other partitions
+    [train_data[:i * num_val_samples],
+    train_data[(i + 1) * num_val_samples:]],
+    axis=0)
+  partial_train_targets = np.concatenate(
+    [train_targets[:i * num_val_samples],
+    train_targets[(i + 1) * num_val_samples:]],
+    axis=0)
+    
+  model = build_model()
+  model.fit(partial_train_data, partial_train_targets, # Trains the model(in silent mode,verbose = 0)
+            epochs=num_epochs, batch_size=1, verbose=0)
+  val_mse, val_mae = model.evaluate(val_data, val_targets, verbose=0)
+  all_scores.append(val_mae)
+```
+
+```{python}
+print(all_scores)
+print(np.mean(all_scores))
+```
+
+### Saving the validation logs at each fold{-}
+
+```{python}
+num_epochs = 500 #100改為500
+all_mae_histories = []
+for i in range(k):
+  print('processing fold #', i)
+  val_data = train_data[i * num_val_samples: (i + 1) * num_val_samples]
+  val_targets = train_targets[i * num_val_samples: (i + 1) * num_val_samples]
+
+  partial_train_data = np.concatenate(
+    [train_data[:i * num_val_samples],
+    train_data[(i + 1) * num_val_samples:]],
+    axis=0)
+  partial_train_targets = np.concatenate(
+    [train_targets[:i * num_val_samples],
+    train_targets[(i + 1) * num_val_samples:]],
+    axis=0)
+    
+  model = build_model()
+  history = model.fit(partial_train_data, partial_train_targets,
+                      validation_data=(val_data, val_targets),
+  epochs=num_epochs, batch_size=1, verbose=0)
+  mae_history = history.history['val_mean_absolute_error']
+  all_mae_histories.append(mae_history)
+```
+
+### Building the history of successive mean K-fold validation scores{-}
+
+```{python}
+average_mae_history = [
+  np.mean([x[i] for x in all_mae_histories]) for i in range(num_epochs)]
+```
+
+### Plotting validation scores{-}
+
+```{python}
+import matplotlib.pyplot as plt
+
+plt.plot(range(1, len(average_mae_history) + 1), average_mae_history)
+plt.xlabel('Epochs')
+plt.ylabel('Validation MAE')
+plt.show()
+```
+
+### Plotting validation scores, excluding the first 10 data points{-}
+
+Replace each point with an exponential moving average of the previous points, to obtain a smooth curve.
+
+```{python}
+def smooth_curve(points, factor=0.9):
+  smoothed_points = []
+  for point in points:
+    if smoothed_points:
+      previous = smoothed_points[-1]
+      smoothed_points.append(previous * factor + point * (1 - factor))
+    else:
+      smoothed_points.append(point)
+  return smoothed_points
+
+smooth_mae_history = smooth_curve(average_mae_history[10:])
+
+plt.plot(range(1, len(smooth_mae_history) + 1), smooth_mae_history)
+plt.xlabel('Epochs')
+plt.ylabel('Validation MAE')
+plt.show()
+```
+
+### Training the final model{-}
+
+```{python}
+model = build_model()
+model.fit(train_data, train_targets,
+          epochs=80, batch_size=16, verbose=0)
+test_mse_score, test_mae_score = model.evaluate(test_data, test_targets)
+```
+
+```{python}
+print(test_mae_score)
+```
+
+# CH4{-}
+
+# 4.1 Four branches of machine learning{-}
+
+## Supervised learning{-}
+
+應用在光學字元辨識、語音辨識、圖像分類、語言翻譯。非監督式學習除了分類、迴歸外，還有一些變種方式如下。
+
+- Sequence generation：給圖片，預測描述它的標題。序列生成有時可重新表述為一系列的分類問題，像是重複預測序列中的單詞或token。
+
+- Syntax tree prediction：給句子，預測它的分解成為語法樹(syntax tree)。
+
+- Object detection：給圖片，在圖片中特定的目標畫出邊界。這也可表示成分類問題(給定很多候選的邊界盒子，分類它們的內容)，或成為結合分類和迴歸的問題，也就是透過向量迴歸預測邊界座標。
+
+- Image segmentation：給圖片，在特定物件上畫a pixel-level mask。
+
+## Unsupervised learning{-}
+
+機器學習的這個分支包括在沒有任何事先的標記下，找到數據的有趣轉換，用於資料視覺化(data visualization)、資料壓縮(data
+compression)、資料去噪(data denoising)，或者方便理解資料中存在的相關性。
+
+無監督式機器學習是數據分析的基礎，且在解決監督式學習的問題時，通常是更好摸索且進一步了解資料的必要步驟。像是降維(dimensionality reduction)或分群(clustering)便是常見的方法。
+ 
+## Self-supervised learning{-}
+
+監督式學習中一個特定的實例，自監督學習是沒有人類去標籤的監督式學習。其標籤通常利用heuristic algorithm生成。
+
+例如， [「自動編碼器」](https://zh.wikipedia.org/wiki/%E8%87%AA%E7%BC%96%E7%A0%81%E5%99%A8)就是自我監督學習的實例。
+
+以同樣的方式，給定過去的幀，嘗試預測影片中的下一幀，或給定前一個詞，預測文本中的下一個。這些都是自我監督學習的實例（temporally supervised learning,是來自未來輸入的資料）。然而監督式學習、自監督學習、無監督式學習之間其實有些模糊，自監督學習其實可以被重新解釋為監督或無監督學習。
+
+## Reinforcement learning{-}
+
+在強化學習中，代理人（agent）會收到有關其環境的資訊，並學會選擇極大化報酬的行動。例如，透過強化學習訓練一個神經網絡，該神經網絡觀察遊戲螢幕，並做遊戲動作的選擇以極大化其得分。
+
+強化學習是目前主要的一個研究領域，但除了遊戲之外還沒有重大的實際成功。未來期望強化學習能有更多的實際應用：自動駕駛汽車、機器人、資源管理、教育等等。
+
+# 4.2 Evaluating machine-learning models{-}
+
+如何評估機器學習的模型，以避免overfitting 並讓模型的應用最大化。
+
+## Training, validation, and test sets{-}
+
+> 為何不分訓練集和驗證集就好了呢？
+
+通常模型參數會透過驗證集的結果去調整，然而這也是一種學習，如果只根據驗證集結果去調整參數，則非常容易overfitting。每一次透過驗證集結果去調整參數時，都透露了驗證集的資料訊息，調整的次數越多，在模型中所包含的驗證集資料訊息也就越多，所以最後需要一個不同的資料集(測試集)再次跑調整完的模型。
+
+### SIMPLE HOLD-OUT VALIDATION{-}
+
+將資料分成訓練集、驗證集、測試集三個部分。
+
+```{python}
+num_validation_samples = 10000
+
+np.random.shuffle(data) #打亂資料順序
+
+validation_data = data[:num_validation_samples] # 定義驗證集
+data = data[num_validation_samples:]
+
+training_data = data[:] # 定義訓練集
+
+model = get_model()
+model.train(training_data) # 用訓練集訓練模型
+validation_score = model.evaluate(validation_data) # 用驗證集評估模型
+
+# At this point you can tune your model,
+# retrain it, evaluate it, tune it again...
+
+model = get_model()
+model.train(np.concatenate([training_data,
+                            validation_data]))
+test_score = model.evaluate(test_data)
+```
+
+這是最簡單的評估方式，但有一個缺點：如果可用的數據很少，那麼驗證集和測試集可能包含的樣本太少，無法在統計上有代表性。
+
+> 如何了解自己的資料是否太少？
+
+如果因為打亂資料順序，而對模型產生非常不同的測試結果，便表示資料太少。
+
+### K-FOLD VALIDATION{-}
+
+將資料平均分成Ｋ個集合，留一個當作測試集，剩下K-1個做訓練，且重複K次，也就是每個集合都會被當作測試集一次，最終模型分數是將K次的分數平均。
+
+```{python}
+k=4
+num_validation_samples = len(data) // k
+
+np.random.shuffle(data)
+
+validation_scores = []
+for fold in range(k):
+  validation_data = data[num_validation_samples * fold:
+    num_validation_samples * (fold + 1)]
+  training_data = data[:num_validation_samples * fold] +  #＋是連結，不是加起來的意思
+    data[num_validation_samples * (fold + 1):]
+
+  model = get_model()
+  model.train(training_data)
+  validation_score = model.evaluate(validation_data)
+  validation_scores.append(validation_score)
+  
+validation_score = np.average(validation_scores) #將K個分數平均
+
+model = get_model()
+model.train(data)
+test_score = model.evaluate(test_data)
+```
+
+### ITERATED K-FOLD VALIDATION WITH SHUFFLING{-}
+
+多次使用 K 折驗證，在每次將資料劃分為 K 個分割槽之前都先將資料打亂。最終分數是多次 k 折交叉驗證再求均值，例如：10 次 10 折交叉驗證，以求更精確一點。需要注意的是這種方法一共要訓練和評估 P×K 個模型（P是重複次數），計算代價很大。
+
+## Things to keep in mind{-}
+
+- Data representativeness:在劃分資料為訓練集與測試集時，務必把資料順序打亂，不然可能會出現訓練集中只包含0-7的類別，而測試集卻只包含8-9類別這種錯誤。
+
+- The arrow of time:如果要預測天氣、股價這種有時間性的資料，則要保持資料的順序，一定是以過去預測未來。
+
+- Redundancy in your data:如果有些資料點重複出現，則要把重複的部分移除，不然訓練集出現的資料點在驗證集又出現會沒有意義，要確保訓練及與驗證集不相交。
+
+# 4.3 Data preprocessing, feature engineering, and feature learning{-}
+
+此章節會先介紹最基礎、一般的數據在將資料輸入神經網絡之前，資料與目標的處理過程，而文字數據或是圖像數據的處理則會在之後討論。
+
+## Data preprocessing for neural networks{-}
+
+處理數據的目的在於讓資料更符合神經網路，這包含四個部分，分別是向量化(vectorization)、一般化(normalization)、處理缺失值(handling missing values)和特徵抽取(feature extraction)。
+
+### VECTORIZATION{-}
+
+神經網絡中的所有輸入和目標必須是浮點數據的張量(tensors)，或是在特定情況下為整數的張量。無論要處理聲音、圖像或文字數據，首先皆必須將資料轉變為張量，這一步稱為數據向量化。 
+
+例如在之前兩個根據字詞的分類例子中，我們從字詞表示為整數列表開始（代表單詞序列），並且進一步使用獨熱編碼將它們轉換為float32的張量。然而在預測房價的例子中，數據已經以向量形式出現，因此跳過此步驟。
+
+### VALUE NORMALIZATION{-}
+
+在digit-classification例子中，一開始是圖像資料，接著利用grayscale對應到編碼0-255的整數，在輸入神經網絡之前，再將其轉換為float32後除以255，這樣才能得到0-1範圍內的浮點值。同樣在預測房價的例子中，每個變數的數值範圍不同，因此也要將其標準化，使其標準差為1，平均值為0。
+
+一般來說，如果輸入相對大的神經網絡數據，也就是比神經網路權重大許多，或是使用異質結構的數據，也就是有些變數範圍是0-1，有些100-200，這些都會讓梯度上升，使神經網路無法收斂。
+
+數據應該有的特徵：
+
+- Take small values—通常是落在0-1之間。
+
+- Be homogenous—所有變數的值應該在相同範圍。
+
+```{python}
+# Assuming x is a 2D data matrix of shape (samples, features) 
+x -= x.mean(axis=0) # Normalize each feature independently to have a mean of 0
+x /= x.std(axis=0) # Normalize each feature independently to have a standard deviation of 1
+```
+
+### HANDLING MISSING VALUES{-}
+
+在神經網路中，如果0沒有在原本的變數代表任何意義，將遺失值輸入為0沒問題，因為神經網絡只會學習有數字的部分，數字0則會自動被忽略。要注意的是，如果訓練集中沒有缺失值，測試集才有缺失值的話，神經網絡並不會學習到缺失值的部分，所以這種情況下需要自己在訓練集中產生缺失值，產生的方式是複製一些訓練集樣本，並刪除樣本中的某些變數特徵(測試集為缺失值的變數特徵)。
+
+## Feature engineering{-}
+
+特徵工程是在將資料放入演算法之前，利用自己對於資料和機器學習演算法的了解，先對數據應用hardcoded （非學習）轉換的過程，可以讓資料放入演算法後更有效率。
+
+例子：
+
+<img src="~/Feature engineering.png">
+
+特徵工程的本質：透過更簡單的問題表達方式，讓問題更容易被解決。不過通常需要先深入了解問題，
+
+# 4.4 Overfitting and underfitting{-}
+
 
 <!--chapter:end:DL_Jane.Rmd-->
 
