@@ -1057,7 +1057,6 @@ layer_output /= 0.5 #scaling up rather scaling down in this case
 
 ![dropout applied to an activation matrix](./dropout applied to an activation matrix.png)
 
-
 ```{python Adding dropout to the IMDB network}
 model = models.Sequential()
 model.add(layers.Dense(16, activation='relu', input_shape=(10000,)))
@@ -1069,16 +1068,142 @@ model.add(layers.Dense(1, activation='sigmoid'))
 
 # 4.5 The universal workflow of machine learning{-}
 
-## Defining the problem and assembling a dataset{-}
+##### Defining the problem and assembling a dataset{-}
 
-## Choosing a measure of success{-}
+1. What will your input data be? What are you trying to predict?
 
-## Deciding on an evaluation protocol{-}
+> You can only learn to predict something if you have available training data.
 
-## Preparing your data{-}
+2. What type of problem are you facing? Is it binary classification? Multiclass classification? Scalar regression? Vector regression? Multiclass, multilabel classification?Something else, like clustering, generation, or reinforcement learning?
 
-## Developing a model that does better than a baseline{-}
+> Identifying the problem type will guide your choice of model architecture, loss function, and so on.
 
-## Scaling up: developing a model that overfits{-}
 
-## Regularizing your model and tuning your hyperparameters{-}
+**NOTE**:Be aware of the hypotheses you make at this stage:
+
+- You hypothesize that your outputs can be predicted given your inputs.
+
+- You hypothesize that your available data is sufficiently informative to learn the relationship between inputs and outputs.
+
+Until you have a working model, these are merely hypotheses, waiting to be validated or invalidated.
+
+
+**NOTE**:One class of unsolvable problems you should be aware of is nonstationary problems.
+
+- One big issue is that the kinds of clothes people buy change from season to season: clothes buying is a nonstationary phenomenon over the scale of a few months.
+
+
+##### Choosing a measure of success{-}
+
+3. What you mean by success—accuracy? Precision and recall? Customer-retention rate?
+
+> Your metric for success will guide the choice of a loss function: what your model will optimize. It should directly align with your higher-level goals.
+
+
+**NOTE**:Common example:
+
+- For balanced-classification problems, where every class is equally likely, accuracy and area under the receiver operating characteristic curve (ROC AUC) are common metrics. 
+
+- For class-imbalanced problems, you can use precision and recall.
+
+- For ranking problems or multilabel classification, you can use mean average precision. 
+
+
+**NOTE**: It isn’t uncommon to have to define your own custom metric by which to measure success. To get a sense of the diversity of machine-learning success metrics and how they relate to different problem domains, it’s helpful to browse the data science competitions on Kaggle (https://kaggle.com); they showcase a wide range of problems and evaluation metrics. 
+
+
+##### Deciding on an evaluation protocol{-}
+
+4.Once you know what you’re aiming for, you must establish how you’ll measure your current progress. 
+
+- Maintaining a hold-out validation set—plenty of data
+
+- Doing K-fold cross-validation—have too few samples for hold-out validation to be reliable
+
+- Doing iterated K-fold validation—little data is available
+
+> In most cases, the first will work well enough. 
+
+
+##### Preparing your data{-}
+
+5. Format your data in a way that can be fed into a machine-learning model.
+
+
+**NOTE**:we’ll assume a deep neural network:
+
+- your data should be formatted as tensors.
+
+- The values taken by these tensors should usually be scaled to small values: for example, in the [-1, 1] range or [0, 1] range.
+
+- If different features take values in different ranges (heterogeneous data), then the data should be normalized.
+
+- You may want to do some feature engineering, especially for small-data problems.
+
+
+##### Developing a model that does better than a baseline{-}
+
+Your goal at this stage is to achieve statistical power: that is, to develop a small model that is capable of beating a dumb baseline.
+
+**NOTE**:that it’s not always possible to achieve statistical power. If you can’t beat a random baseline after trying multiple reasonable architectures, it may be that the answer to the question you’re asking isn’t present in the input data. Remember that you make two hypotheses.It may well be that these hypotheses are false, in which case you must go back to the drawing board.
+
+6. Assuming that things go well, you need to make three key choices to build your first working model:
+
+- Last-layer activation:This establishes useful constraints on the network’s output.
+
+- Loss function:This should match the type of problem you’re trying to solve. 
+
+- Optimization configuration:What optimizer will you use? What will its learning rate be? In most cases, it’s safe to go with rmsprop and its default learning rate.
+
+> It isn’t always possible to directly optimize for the metric that measures success on a problem. Sometimes there is no easy way to turn a metric into a loss function
+
+**NOTE**:Loss functions, need to be computable given only a mini-batch of data (ideally, a loss function should be computable for as little as a single data point) and must be differentiable (otherwise, you can’t use backpropagation to train your network).
+
+- For instance, the widely used classification metric ROC AUC can’t be directly optimized. Hence, in classification tasks, it’s common to optimize for a proxy metric of ROC AUC, such as crossentropy. In general, you can hope that the lower the crossentropy gets, the higher the ROC AUC will be.
+
+![loss function for model](./loss function for model.png)
+
+##### Scaling up: developing a model that overfits{-}
+
+7. Your model sufficiently powerful? Does it have enough layers and parameters to properly model the problem at hand?
+
+> the universal tension in machine learning is between optimization and generalization; the ideal model is one that stands right at the border between underfitting and overfitting; between undercapacity and overcapacity. To figure out where this border lies, first you must cross it.
+
+**NOTE**:To figure out how big a model you’ll need, you must develop a model that overfits.
+
+- Add layers.
+
+- Make the layers bigger.
+
+- Train for more epochs.
+
+Always monitor the training loss and validation loss, as well as the training and validation values for any metrics you care about. When you see that the model’s performance on the validation data begins to degrade, you’ve achieved overfitting.
+
+##### Regularizing your model and tuning your hyperparameters{-}
+
+8. repeatedly modify your model, train it, evaluate on your validation data (not the test data, at this point), modify it again, and
+repeat, until the model is as good as it can get. These are some things you should try:
+
+- Add dropout.
+
+- Try different architectures: add or remove layers.
+
+- Add L1 and/or L2 regularization.
+
+- Try different hyperparameters (such as the number of units per layer or the learning rate of the optimizer) to find the optimal configuration.
+
+- Optionally, iterate on feature engineering: add new features, or remove features that don’t seem to be informative.
+
+> Every time you use feedback from your validation process to tune your model, you leak information about the validation process into the model.Done systematically over many iterations, it will eventually cause your model to overfit to the validation process.
+
+
+9.  Once you’ve developed a satisfactory model configuration, you can train your final production model on all the available data (training and validation) and evaluate it one last time on the test set. 
+
+
+**NOTE**:performance on the test set is significantly worse than the performance measured on the validation data
+
+- your validation procedure wasn’t reliable after all
+
+- you began overfitting to the validation data while tuning the parameters of the model
+
+In this case, you may want to switch to a more reliable evaluation protocol (such as iterated K-fold validation).
