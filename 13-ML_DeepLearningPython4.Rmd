@@ -135,4 +135,96 @@ That’s the essence of feature engineering: making a problem easier by expressi
 > 關於validation set，確實只有如此嗎？有沒有一個實際的例子。
 
 
+## 4.4 Overfitting and underfitting
+
+1. Overfitting happens in everymachine-learning problem. Learning how to deal with overfitting is essential to mas-tering machine learning
+
+2.  the lower the loss on training data, the lower the loss on test data. While this is happening, your model is said to be __underfit__: there is still progress to be made; the network hasn’t yet modeled all relevant patterns in the training data.
+
+3. To prevent a model from learning misleading or irrelevant patterns found in thetraining data, the best solution is to get more training data. 
+
+4. The processing of fighting overfitting this way is called __regularization__. 
+
+Let's show some useful technique in regularization.
+
+- Get more training data(the best solution, if not, see the three techniques below)
+- Reduce the capacity of the network
+- Add weight regularization
+- Add dropout
+
+### 4.4.1 Reducing the network's size
+
+1. too much capacity and not enough capacity is an art
+
+意思是指不要讓你的深度學習模型的layer and unit of layer過高，因為你讓模型過太爽，他可以輕鬆地將資料大量的保留。但是卻不易魚一班話，這樣面對新的資料及時候，很難表現得好。
+
+同時不要把你的模型容納空間資訊壓得太小，這樣會有uderfitting的問題，你的模型還沒有捕捉玩所有的資料變異，就要進到下一層的layer了，已經被篩掉的資料特性是不會被保留的 。
+
+2. The general workflow to find an appropriate modelsize is to start with relatively few layers and parameters, and increase the size of the layers or add new layers until you see diminishing returns with regard to validation loss.
+
+```{python}
+from keras import models
+from keras import layers
+model = models.Sequential()
+model.add(layers.Dense(16, activation='relu', input_shape=(10000,)))
+model.add(layers.Dense(16, activation='relu'))
+model.add(layers.Dense(1, activation='sigmoid'))
+```
+
+用比較少的network來做做看，並且把他當成benchmark model，進行近一步的優化.
+```{python}
+model = models.Sequential()
+model.add(layers.Dense(4, activation='relu', input_shape=(10000,)))
+model.add(layers.Dense(4, activation='relu'))
+model.add(layers.Dense(1, activation='sigmoid'))
+```
+
+
+### 4.4.2 Adding weight regularization
+
+It’s done by adding to the loss function of the network a cost associated with having large weights. This cost comes in two flavors:
+
+1. __L1 regularization__: The cost added is proportional to the absolute value of the weight coefficients
+2. __L2 regularization__: The cost added is proportional to the square of the value of the weight coefficients (the L2 norm of the weights). L2 regularization is also called __weight decay__ in the context of neural networks. Don’t let the different name confuse you: weight decay is mathematically the same as L2 regularization
+
+```{python}
+from keras import regularizers
+model = models.Sequential()
+model.add(layers.Dense(16, kernel_regularizer=regularizers.l2(0.001),activation='relu', input_shape=(10000,)))
+model.add(layers.Dense(16, kernel_regularizer=regularizers.l2(0.001),activation='relu'))
+model.add(layers.Dense(1, activation='sigmoid'))
+```
+
+### 4.4.3 Adding Dropout
+
+1. The dropout rate is the fraction of the features that are zeroed out; it’s usually set between 0.2 and 0.5
+
+(dropout就是將每一層輸出的結果，以一定比例將其歸零。用意是降低到此為止的資訊濃縮度，藉此降低過度配適問題。)
+
+2.  At test time, no units are dropped out; instead, the layer’s output values are scaled down by a factor equal to the dropout rate, to balance for the fact that more units are active than at training time
+
+在訓練資料集裡面，我們會採取dropout，但是在test data，我們不會以dropout這個動作。但是我們會將這個layer所輸出的資訊量，以跟dropout rate相同比率的前提下，將其規模縮小。（好比說輸出資訊量有10個浮點數數字，我會依照比例0.2去掉兩個，剩下八個，而不是將其歸零。
+
+```{python}
+layer_output *= np.random.randint(0, high=2, size=layer_output.shape)
+# At training time, drops out 50% of the units in the output
+```
+
+```{python}
+layer_output *= 0.5
+#At test time
+```
+
+3. The core idea is that introducing noise in the output values of a layer can break up happenstance patterns that aren’t significant
+
+透過隨機將訓練資料集的訊息歸零，用意是藉此破壞資料與資料之間不顯著的關聯性（Hinton形容其為conspiracies，共謀關係），來避免過度配適。
+
+```{python}
+model = models.Sequential()
+model.add(layers.Dense(16, activation='relu', input_shape=(10000,)))
+model.add(layers.Dropout(0.5))
+model.add(layers.Dense(16, activation='relu'))
+model.add(layers.Dropout(0.5)) #layer.Dropout
+model.add(layers.Dense(1, activation='sigmoid'))
+```
 
