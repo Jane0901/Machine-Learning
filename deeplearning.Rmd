@@ -1,0 +1,198 @@
+---
+title: "deeplearning_ginkapap"
+output: 
+  html_document: 
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,fig.showtext=TRUE)
+library(dplyr)
+library(knitr)
+library(magrittr)
+library(kableExtra)
+library(DT)
+library(stringr)
+library(readr)
+library(htmltools)
+library(ggplot2)
+library(purrr)
+library(lubridate)
+library(tidyr)
+library(showtext)
+#font_add("QYuan","cwTeXQYuan-Medium.ttf")
+showtext_auto(enable=TRUE)
+theme_set(theme_classic())
+```
+```{r}
+library("reticulate")
+use_condaenv("ginkapap")
+#conda_install(envname = "ginkapap",c("pandas"))
+#conda_install(envname = "ginkapap",c("keras",'tensorflow'))
+#py_available()
+```
+
+# 引言
+
+輸入影像的資料時，該data通常包含了水平、垂直、color channel等三維資訊，但傳統DNN的輸入處理必須是平面的、也就是須一維的資料。
+去除了這些形狀資訊，就代表失去了一些重要的空間資料，像不同影像但類似的空間可能有著相似的像素值，RGB不同的channel之間也可能具有某些關連性、而遠近不同的像素彼此也應具有不同的關聯性，而這些資訊只有在三維形狀中才能保留下來。
+
+The fundamental difference between a densely connected layer and a convolution layer is this: Dense layers learn global patterns in their input feature space, whereas convolution layers learn local patterns.
+
+<img src='https://imgur.com/aySk5NS.jpg'>
+
+<img src='https://imgur.com/g0c9uMY.jpg'>
+
+This key characteristic gives convnets two interesting properties:
+
+1. The patterns they learn are translation invariant. After learning a certain pattern in the lower-right corner of a picture, a convnet can recognize it anywhere
+
+2. They can learn spatial hierarchies of patterns (see figure 5.2). A first convolution layer will learn small local patterns such as edges, a second convolution layer will learn larger patterns made of the features of the first layers, and so on. This allows convnets to efficiently learn increasingly complex and abstract visual concepts 
+
+<img src='https://imgur.com/uRCwMGp.jpg'>
+
+CNN流程圖：
+
+<img src='https://imgur.com/dQ2M47c.jpg'>
+
+<img src='https://imgur.com/EI6OXHA.jpg'>
+
+# Convolutions layer
+
+## 觀念
+
+CNN的Convolution layer的目的就是在保留圖像的空間排列並取得局部圖像作為輸入特徵。
+
+Convolutions are defined by two key parameters:
+
+-  Size of the patches extracted from the inputs—These are typically 3 × 3 or 5 × 5. In the example, they were 3 × 3, which is a common choice.
+
+-  Depth of the output feature map—The number of filters computed by the convolution.
+
+In the MNIST example, the first convolution layer takes a feature map of size (28, 28, 1) :
+水平28 pixels、垂直28 pixels、color channel=1
+
+outputs a feature map of size (26, 26, 32):
+It computes 32 filters over its input. 
+Each of these 32 output channels contains a 26 × 26 grid of values, which is a response map of the filter over the input, indicating the response of that filter pattern at different locations in the input. 
+
+That is what the term feature map means: every dimension in the depth axis is a feature (or filter), and the 2D tensor output[:, :, n] is the 2D spatial map of the response of this filter over the input.
+
+## 程式介紹
+
+Conv2D(output_depth, (window_height, window_width))
+
+```{python echo = TRUE}
+from keras import layers 
+from keras import models
+model = models.Sequential()
+model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1))) 
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+model.summary()
+model.add(layers.Flatten())
+model.add(layers.Dense(64, activation='relu'))
+model.add(layers.Dense(10, activation='softmax'))
+model.summary()
+
+```
+
+## 3D(RBG)中
+
+(shape (window_height, window_width, input_depth))
+
+假設輸入影像有(R, G, B)三個channel，在第一層進行一次10個3×3的Kernel Map，第一次output就會有3×3×3×10=270個參數。
+
+<img src='https://imgur.com/bum4gRp.jpg'>
+
+<img src='https://imgur.com/WtdwodI.jpg'>
+
+Note that the output width and height may differ from the input width and height. They may differ for two reasons:
+
+-  Border effects, which can be countered by padding the input feature map .
+
+-  The use of strides, which I’ll define in a second.
+
+# Padding
+
+## 觀念
+
+Consider a 5 × 5 feature map (25 tiles total). There are only 9 tiles around which you can center a 3 × 3 window, forming a 3 × 3 grid (see figure 5.5)
+
+<img src='https://imgur.com/G4kCByJ.jpg'>
+
+If you want to get an output feature map with the same spatial dimensions as the input, you can use padding. Padding consists of adding an appropriate number of rows and columns on each side of the input feature map so as to make it possible to fit cen- ter convolution windows around every input tile. For a 3 × 3 window, you add one col- umn on the right, one column on the left, one row at the top, and one row at the bottom. For a 5 × 5 window, you add two rows.
+
+<img src='https://imgur.com/XwT21US.jpg'>
+
+## 程式介紹
+
+In Conv2D layers, padding is configurable via the padding argument, which takes two values: 
+valid: no padding 
+same: pad in such a way as to have an output with the same width and height as the input. 
+The padding argument defaults to "valid".
+
+# Convilution Strides
+
+The other factor that can influence output size is the notion of strides.
+
+The distance between two successive windows is a parameter of the convolution, called its stride, which defaults to 1. It’s possible to have strided convolu- tions: convolutions with a stride higher than 1
+
+<img src='https://imgur.com/iIxdTwD.jpg'>
+
+
+Using stride 2 means the width and height of the feature map are downsampled by a factor of 2 
+Strided convolu- tions are rarely used in practice, although they can come in handy for some types of models; it’s good to be familiar with the concept.
+
+To downsample feature maps, instead of strides,we tend to use the max-pooling operation
+
+## The max-pooling operation
+
+Pooling layer稱為池化層，它的功能很單純，就是將輸入的圖片尺寸縮小（大部份為縮小一半）以減少每張feature map維度並保留重要的特徵，只取得其中最大的那个Pooling层作为保留值，其他特征值全部拋棄，值最大代表只保留這些特征中最强的，拋棄其他弱的此類特征。
+
+<img src='https://imgur.com/9NnagQK.jpg'>
+
+Max pooling is usually done with 2 × 2 windows and stride 2.
+
+優點：
+
+-  保證特徵的位置與旋轉不變性（invariance）。
+
+<img src='https://imgur.com/bJFvlWo.jpg'>
+
+-  進行flatten時若參數太多運算會很慢，維度縮減可以增加運算速度。
+
+-  減少模型參數數量，減少overfitting問題。
+
+缺點：
+
+-  Max Pooling只保留一个最大值，所以即使某个特征出現很多次，也只能看到一次，就是说同一特征的强度信息丢失了。
+
+其他pooling方法：Mean pooling...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
